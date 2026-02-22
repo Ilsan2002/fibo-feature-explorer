@@ -1,0 +1,4421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fibo Feature Explorer</title>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+@theme {
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #06060b;
+  color: #e2e8f0;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+.gradient-text {
+  background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.gradient-border {
+  background: linear-gradient(135deg, rgba(96,165,250,0.15), rgba(167,139,250,0.15));
+  border: 1px solid rgba(96,165,250,0.2);
+}
+.gradient-border-bright {
+  border: 1px solid rgba(96,165,250,0.4);
+}
+.card-glow:hover {
+  box-shadow: 0 0 30px rgba(96,165,250,0.08), 0 4px 20px rgba(0,0,0,0.3);
+  border-color: rgba(96,165,250,0.35);
+  transform: translateY(-2px);
+}
+.hero-glow {
+  background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(96,165,250,0.15), transparent);
+}
+.stat-card {
+  background: rgba(15,15,25,0.6);
+  border: 1px solid rgba(255,255,255,0.06);
+  backdrop-filter: blur(10px);
+}
+.pill-active {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: white;
+  border-color: transparent;
+}
+.pill-inactive {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #94a3b8;
+}
+.pill-inactive:hover {
+  background: rgba(255,255,255,0.08);
+  color: #e2e8f0;
+}
+.status-implemented { background: rgba(34,197,94,0.12); color: #4ade80; border: 1px solid rgba(34,197,94,0.25); }
+.status-in_progress { background: rgba(59,130,246,0.12); color: #60a5fa; border: 1px solid rgba(59,130,246,0.25); }
+.status-proposed { background: rgba(250,204,21,0.1); color: #facc15; border: 1px solid rgba(250,204,21,0.2); }
+.status-planned { background: rgba(168,85,247,0.12); color: #c084fc; border: 1px solid rgba(168,85,247,0.25); }
+.status-discussed { background: rgba(148,163,184,0.1); color: #94a3b8; border: 1px solid rgba(148,163,184,0.2); }
+.status-rejected { background: rgba(239,68,68,0.1); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+.status-researched { background: rgba(20,184,166,0.1); color: #2dd4bf; border: 1px solid rgba(20,184,166,0.2); }
+.status-other { background: rgba(148,163,184,0.1); color: #94a3b8; border: 1px solid rgba(148,163,184,0.2); }
+
+.fade-in { animation: fadeIn 0.4s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+.search-glow:focus-within {
+  box-shadow: 0 0 0 2px rgba(96,165,250,0.3), 0 0 20px rgba(96,165,250,0.1);
+  border-color: rgba(96,165,250,0.5);
+}
+
+.category-nav::-webkit-scrollbar { height: 0; }
+.category-nav { -ms-overflow-style: none; scrollbar-width: none; }
+
+[x-cloak] { display: none !important; }
+</style>
+</head>
+<body>
+
+<div x-cloak x-data="featureExplorer()" x-init="init()">
+
+  <!-- HERO -->
+  <div class="hero-glow relative overflow-hidden">
+    <div class="max-w-6xl mx-auto px-4 pt-16 pb-10 text-center relative z-10">
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium mb-6"
+           style="background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.2);color:#60a5fa">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        Extracted from 1,828 Telegram messages
+      </div>
+      <h1 class="text-5xl md:text-6xl font-extrabold tracking-tight mb-4">
+        <span class="gradient-text">Fibo</span> Feature Explorer
+      </h1>
+      <p class="text-lg text-gray-400 max-w-2xl mx-auto mb-10">
+        Every idea, feature, and proposal discussed by the Fibo team from 2024&ndash;2026.
+        Explore the full thinking process behind a health &amp; productivity app for college students.
+      </p>
+      <div class="flex flex-wrap justify-center gap-4 md:gap-8">
+        <div class="stat-card rounded-xl px-6 py-4 text-center min-w-[120px]">
+          <div class="text-3xl font-bold gradient-text" x-text="totalCount">304</div>
+          <div class="text-xs text-gray-500 mt-1 uppercase tracking-wider">Ideas</div>
+        </div>
+        <div class="stat-card rounded-xl px-6 py-4 text-center min-w-[120px]">
+          <div class="text-3xl font-bold gradient-text">17</div>
+          <div class="text-xs text-gray-500 mt-1 uppercase tracking-wider">Categories</div>
+        </div>
+        <div class="stat-card rounded-xl px-6 py-4 text-center min-w-[120px]">
+          <div class="text-3xl font-bold gradient-text">11</div>
+          <div class="text-xs text-gray-500 mt-1 uppercase tracking-wider">Contributors</div>
+        </div>
+        <div class="stat-card rounded-xl px-6 py-4 text-center min-w-[120px]">
+          <div class="text-3xl font-bold gradient-text" x-text="implementedCount">108</div>
+          <div class="text-xs text-gray-500 mt-1 uppercase tracking-wider">Built</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STICKY SEARCH + FILTER BAR -->
+  <div class="sticky top-0 z-50 border-b border-white/5" style="background:rgba(6,6,11,0.85);backdrop-filter:blur(16px);">
+    <div class="max-w-6xl mx-auto px-4 py-3">
+      <!-- Search -->
+      <div class="search-glow flex items-center gap-3 rounded-xl px-4 py-2.5 mb-3 transition-all"
+           style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
+        <i data-lucide="search" class="w-4 h-4 text-gray-500 shrink-0"></i>
+        <input type="text" x-model="search" :placeholder="'Search ' + features.length + ' features...'"
+               class="bg-transparent border-0 outline-none w-full text-sm text-gray-200 placeholder-gray-500">
+        <template x-if="search">
+          <button @click="search = ''" class="text-gray-500 hover:text-gray-300 transition-colors">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </template>
+      </div>
+
+      <!-- Status filter chips -->
+      <div class="flex flex-wrap gap-2 mb-3">
+        <template x-for="s in statusOptions" :key="s.key">
+          <button @click="toggleStatus(s.key)"
+                  :class="activeStatuses.includes(s.key) ? 'pill-active' : 'pill-inactive'"
+                  class="px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5">
+            <span x-text="s.label"></span>
+            <span class="opacity-60" x-text="'(' + statusCounts[s.key] + ')'"></span>
+          </button>
+        </template>
+        <button x-show="activeStatuses.length > 0" @click="activeStatuses = []"
+                class="px-3 py-1 rounded-full text-xs font-medium text-gray-500 hover:text-gray-300 transition-colors cursor-pointer">
+          Clear filters
+        </button>
+      </div>
+
+      <!-- Category pills -->
+      <div class="category-nav flex gap-2 overflow-x-auto pb-1">
+        <button @click="scrollToCategory('all')"
+                :class="activeCategory === 'all' ? 'pill-active' : 'pill-inactive'"
+                class="px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap shrink-0">
+          All
+        </button>
+        <template x-for="cat in categories" :key="cat.id">
+          <button @click="scrollToCategory(cat.id)"
+                  :class="activeCategory === cat.id ? 'pill-active' : 'pill-inactive'"
+                  class="px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-1.5">
+            <i :data-lucide="cat.icon" class="w-3 h-3"></i>
+            <span x-text="cat.name"></span>
+            <span class="opacity-50" x-text="'(' + getCategoryCount(cat.id) + ')'"></span>
+          </button>
+        </template>
+      </div>
+    </div>
+
+    <!-- Results count bar -->
+    <div x-show="search || activeStatuses.length > 0" class="max-w-6xl mx-auto px-4 pb-2">
+      <div class="text-xs text-gray-500">
+        Showing <span class="text-gray-300 font-medium" x-text="filteredFeatures.length"></span> of <span x-text="features.length"></span> features
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <template x-for="cat in categories" :key="cat.id">
+      <div x-show="getCategoryFeatures(cat.id).length > 0"
+           :id="'cat-' + cat.id"
+           class="mb-12 fade-in">
+        <!-- Category header -->
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+               style="background:linear-gradient(135deg,rgba(96,165,250,0.15),rgba(167,139,250,0.15));border:1px solid rgba(96,165,250,0.2)">
+            <i :data-lucide="cat.icon" class="w-5 h-5 text-blue-400"></i>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold text-white" x-text="cat.name"></h2>
+            <p class="text-xs text-gray-500" x-text="getCategoryCount(cat.id) + ' features'"></p>
+          </div>
+        </div>
+
+        <!-- Cards grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          <template x-for="(feature, idx) in getVisibleFeatures(cat.id)" :key="feature.id">
+            <div @click="(feature.description || feature.sourceUrl) && toggleExpand(feature.id)"
+                 @keydown.enter="(feature.description || feature.sourceUrl) && toggleExpand(feature.id)"
+                 @keydown.space.prevent="(feature.description || feature.sourceUrl) && toggleExpand(feature.id)"
+                 role="button"
+                 tabindex="0"
+                 class="rounded-xl p-4 cursor-pointer transition-all duration-200 card-glow focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                 style="background:rgba(15,15,25,0.5);border:1px solid rgba(255,255,255,0.06);">
+              <!-- Card header -->
+              <div class="flex items-start justify-between gap-2 mb-2">
+                <h3 class="text-sm font-semibold text-gray-100 leading-snug" x-text="feature.title"></h3>
+                <span :class="'status-' + feature.statusGroup"
+                      class="text-[10px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap shrink-0"
+                      x-text="feature.statusGroup.replace('_',' ').replace(/\b\w/g, c => c.toUpperCase())"></span>
+              </div>
+
+              <!-- Sender -->
+              <div x-show="feature.sender" class="flex items-center gap-1.5 mb-2">
+                <i data-lucide="user" class="w-3 h-3 text-gray-600"></i>
+                <span class="text-xs text-gray-500" x-text="feature.sender"></span>
+              </div>
+
+              <!-- Expanded content -->
+              <div x-show="expandedIds.includes(feature.id)" x-collapse class="mt-3 pt-3 border-t border-white/5">
+                <p x-show="feature.description" class="text-xs text-gray-400 leading-relaxed mb-2" x-text="feature.description"></p>
+                <div x-show="feature.status && feature.status !== feature.statusGroup" class="text-[10px] text-gray-600 mb-1">
+                  Status detail: <span class="text-gray-500" x-text="feature.status"></span>
+                </div>
+                <a x-show="feature.sourceUrl" :href="feature.sourceUrl" target="_blank" @click.stop
+                   class="inline-flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 transition-colors mt-1">
+                  <i data-lucide="external-link" class="w-3 h-3"></i>
+                  <span x-text="feature.source || 'View source'"></span>
+                </a>
+              </div>
+
+              <!-- Expand hint -->
+              <div x-show="!expandedIds.includes(feature.id) && feature.description" class="mt-2">
+                <span class="text-[10px] text-gray-600 flex items-center gap-1">
+                  <i data-lucide="chevron-down" class="w-3 h-3"></i> Click to expand
+                </span>
+              </div>
+            </div>
+          </template>
+        </div>
+
+        <!-- Show more button -->
+        <div x-show="getCategoryFeatures(cat.id).length > defaultShowCount" class="mt-4 text-center">
+          <button @click="toggleShowAll(cat.id)"
+                  class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors"
+                  style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
+            <template x-if="!showAllCategories.includes(cat.id)">
+              <span class="flex items-center gap-2">
+                Show all <span x-text="getCategoryFeatures(cat.id).length"></span>
+                <i data-lucide="chevron-down" class="w-4 h-4"></i>
+              </span>
+            </template>
+            <template x-if="showAllCategories.includes(cat.id)">
+              <span class="flex items-center gap-2">
+                Show less
+                <i data-lucide="chevron-up" class="w-4 h-4"></i>
+              </span>
+            </template>
+          </button>
+        </div>
+      </div>
+    </template>
+
+    <!-- Empty state -->
+    <div x-show="filteredFeatures.length === 0" class="text-center py-20">
+      <i data-lucide="search-x" class="w-12 h-12 text-gray-700 mx-auto mb-4"></i>
+      <p class="text-gray-500 text-lg">No features match your search</p>
+      <button @click="search = ''; activeStatuses = []"
+              class="mt-4 px-4 py-2 rounded-lg text-sm text-blue-400 hover:text-blue-300 cursor-pointer"
+              style="background:rgba(59,130,246,0.1);">
+        Clear all filters
+      </button>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-white/5 py-8 mt-8">
+    <div class="max-w-6xl mx-auto px-4 text-center text-xs text-gray-600">
+      <p>Fibo Feature Explorer &mdash; Extracted from Telegram group chat (2024&ndash;2026)</p>
+      <p class="mt-1">Fibonacci Labs, LLC &middot; <span x-text="features.length"></span> features across 17 categories &middot; 1,828 messages analyzed</p>
+    </div>
+  </footer>
+</div>
+
+<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.14.8/dist/cdn.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
+<script>
+const FEATURES_DATA = [
+{
+"id": 1,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "AI-powered scheduling suggestion endpoint",
+"description": "GPT takes user input (\"Gym session next week\") and current schedule, returns 2+ suggested time slots with reasoning. Sends POST to /api/schedule/suggest",
+"sender": "Итан",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 2,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "Client-side date/time parsing with chrono-node",
+"description": "Use lightweight NLP library on client side to parse natural language dates (\"tomorrow\", \"3pm to 5pm\") instead of sending everything to the backend",
+"sender": "Итан",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 3,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "SwiftyChrono for iOS date parsing",
+"description": "Swift port of chrono used to parse dates on iOS client side. Handles \"morning\", \"evening\", \"afternoon\", \"noon\" with default times",
+"sender": "Bah",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 4,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "Apple's Natural Language framework for extracting task names",
+"description": "Use Apple's on-device NLP to extract event/task names from user input rather than sending to GPT",
+"sender": "Итан",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 5,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "Compromise.js library for entity/name extraction",
+"description": "Use open-source NLP library to pull event names from raw input",
+"sender": "Итан",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 6,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "Incremental/on-device input parsing",
+"description": "Parse user input client-side incrementally to reduce latency compared to round-tripping to the backend for GPT",
+"sender": "Итан",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 7,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "Context window for AI suggestions (2-week rolling schedule)",
+"description": "Send user's next two weeks of events as context with every suggestion request so GPT can place tasks in available gaps",
+"sender": "Итан",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 8,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "Upgrade to GPT-4 (from GPT-3.5 Turbo) for suggestions",
+"description": "Code was using gpt-3.5-turbo; flagged for upgrade to gpt-4",
+"sender": "Ilsan",
+"status": "identified",
+"statusGroup": "in_progress",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 9,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "GPT format corrector",
+"description": "Middleware that manually fixes malformed JSON from GPT before returning to client",
+"sender": "Итан",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 10,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "Switch to GPT-4o mini",
+"description": "Adopt newer cheaper, faster model (60% cheaper than GPT-3.5 Turbo, smarter)",
+"sender": "Kalys",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 11,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "Production: query events on backend rather than passing from client",
+"description": "For production, backend queries user's schedule rather than client sending it on every request",
+"sender": "Итан",
+"status": "proposed (post-MVP)",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 12,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "Prompt engineering improvements for scheduling",
+"description": "Improve GPT prompts to produce better/more reliable suggestions",
+"sender": "Итан",
+"status": "in progress",
+"statusGroup": "in_progress",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 13,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "AI-powered \"Start Focus Session\" button",
+"description": "Instead of a passive notification, an explicit button that starts a timer for a task right away",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 14,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "Set a big goal → AI generates step-by-step plan with scheduled time blocks",
+"description": "User states a macro goal and Fibo auto-creates and schedules all sub-tasks",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 15,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "Schedule quality score",
+"description": "AI rates or scores the quality/efficiency of a user's current schedule",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 16,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "Fibo analyzes calendar and suggests how to schedule events more efficiently",
+"description": "Proactive calendar optimization recommendations",
+"sender": "Kalys",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 17,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "LLM-based advance notification scheduling",
+"description": "Use LLM to decide how many days/hours in advance to notify a user about a task, based on task complexity",
+"sender": "Kalys",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 18,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "X.ai-style AI scheduling assistant for meetings",
+"description": "Automated back-and-forth meeting scheduling like the old x.ai service (CC an AI to coordinate meeting times)",
+"sender": "Ilsan",
+"status": "discussed (inspiration)",
+"statusGroup": "discussed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 19,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "Letting Fibo find a meeting time between two users",
+"description": "Shared availability matching for mutual scheduling",
+"sender": "Ilsan",
+"status": "proposed (long-term)",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 20,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "MCP (Model Context Protocol) integration for AI context",
+"description": "Use MCP to connect Fibo's AI directly to Moodle/Canvas APIs so the scheduling assistant has live course context (upcoming deadlines, syllabi, class times) without the user manually providing it",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "modelcontextprotocol.io",
+"sourceUrl": "https://modelcontextprotocol.io/introduction"
+},
+{
+"id": 21,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "Appetite-based time estimation for assignments",
+"description": "Inspired by Shape Up (Basecamp): when a student adds a task, Fibo prompts them to set an \"appetite\" (how much time they're willing to spend) rather than a fixed estimate. AI then fits the task into available calendar slots accordingly",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "basecamp.com/shapeup",
+"sourceUrl": "https://basecamp.com/shapeup/0.3-chapter-01"
+},
+{
+"id": 22,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "Daily Intention morning prompt",
+"description": "Inspired by Caroline Webb's behavioral science: each morning Fibo asks the student to set one aim, one attitude, and one assumption for the day. The AI uses these inputs to reorder and filter which scheduled tasks surface first",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "youtu.be/jyxkRYrEfiE",
+"sourceUrl": "https://youtu.be/jyxkRYrEfiE"
+},
+{
+"id": 23,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "\"Nine Lives\" onboarding personalization flow",
+"description": "Inspired by Graham Weaver (Stanford GSB): during onboarding the student defines what an ideal week looks like across 3–5 life areas (academics, fitness, social, creativity). AI uses these weights when prioritizing scheduling decisions",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "youtu.be/uxoCnxlxpIk",
+"sourceUrl": "https://youtu.be/uxoCnxlxpIk"
+},
+{
+"id": 24,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "Smart buffer blocks between back-to-back classes",
+"description": "Inspired by Reclaim.ai: Fibo auto-inserts 5–10 min recovery blocks after consecutive classes or study sessions, labelled as health actions (stretch, hydrate, breathe) rather than dead time",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "youtu.be/ofhsEkTf_7E",
+"sourceUrl": "https://youtu.be/ofhsEkTf_7E"
+},
+{
+"id": 25,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "Spaced repetition auto-scheduler",
+"description": "Inspired by Huberman's neuroscience study tips: Fibo auto-schedules a review block 24h after each study session and enforces an 8h sleep gap before exam days, surfacing a notification like \"Your brain is consolidating what you learned — protect tonight's sleep.\"",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "youtu.be/1bszFX_XcbU",
+"sourceUrl": "https://youtu.be/1bszFX_XcbU"
+},
+{
+"id": 26,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "Peak Hour Lock",
+"description": "User designates their 1–2 highest-energy hours of the day as protected. Fibo refuses to schedule low-priority tasks or meetings in those slots and auto-fills them with the student's highest-cognitive-demand work",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "youtu.be/LKXzmh6vKx8",
+"sourceUrl": "https://youtu.be/LKXzmh6vKx8"
+},
+{
+"id": 27,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "AI Difficulty Calibrator for tasks",
+"description": "Inspired by Duolingo's AI approach (Severin Hacker): Fibo analyzes past completion rates and time spent per subject to automatically adjust estimated effort and optimal scheduling, keeping assignments in the student's challenge zone (not too easy, not avoidance-triggering)",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "youtu.be/B9sEJurtZIU",
+"sourceUrl": "https://youtu.be/B9sEJurtZIU"
+},
+{
+"id": 28,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "Buffer Mode — 20% slack time built into every day",
+"description": "Inspired by Justin Sung: AI automatically leaves 20% of each day's blocks empty and pre-labels the lowest-priority task as \"drop-if-needed,\" displayed visually so students start with realistic expectations",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "youtu.be/Y-jbe-je5XM",
+"sourceUrl": "https://youtu.be/Y-jbe-je5XM"
+},
+{
+"id": 29,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "Reschedule Cascade",
+"description": "Inspired by Motion: when a student marks a task as skipped or a class runs late, Fibo instantly re-optimizes all subsequent blocks for the day and presents a revised timeline rather than leaving a broken schedule",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "youtu.be/ZKbAIDUlumg",
+"sourceUrl": "https://youtu.be/ZKbAIDUlumg"
+},
+{
+"id": 30,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "Skill Gap Study Playlist",
+"description": "Inspired by Teach to One: Fibo's AI analyzes upcoming syllabus content and self-reported quiz performance to generate a weekly study playlist that targets the student's weakest topics first, sequenced toward deadlines",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "en.wikipedia.org/wiki/Teach_to_One",
+"sourceUrl": "https://en.wikipedia.org/wiki/Teach_to_One"
+},
+{
+"id": 31,
+"categoryId": 1,
+"category": "Scheduling & AI",
+"icon": "brain",
+"title": "Biometric cognitive load detection (roadmap)",
+"description": "Inspired by Meta Brain AI research: long-term roadmap to integrate Apple Watch HRV and optional EEG wearables to passively detect mental fatigue and automatically shorten or reschedule deep work sessions without manual input",
+"sender": null,
+"status": "proposed (long-term roadmap)",
+"statusGroup": "proposed",
+"source": "ai.meta.com/blog/brain-ai-research",
+"sourceUrl": "https://ai.meta.com/blog/brain-ai-research-human-communication/"
+},
+{
+"id": 32,
+"categoryId": 2,
+"category": "Calendar",
+"icon": "calendar",
+"title": "Creating / updating / deleting events",
+"description": "Full CRUD for calendar events",
+"sender": "Bah",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 33,
+"categoryId": 2,
+"category": "Calendar",
+"icon": "calendar",
+"title": "Month / week / day calendar views with switching",
+"description": "Standard calendar views",
+"sender": "Bah",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 34,
+"categoryId": 2,
+"category": "Calendar",
+"icon": "calendar",
+"title": "Days of the week shown on top of month view",
+"description": "",
+"sender": "Ilsan",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 35,
+"categoryId": 2,
+"category": "Calendar",
+"icon": "calendar",
+"title": "Month name displayed on top of calendar",
+"description": "",
+"sender": "Ilsan",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 36,
+"categoryId": 2,
+"category": "Calendar",
+"icon": "calendar",
+"title": "Sync with Apple Calendar (EventKit)",
+"description": "Bidirectional sync with native iOS Calendar app",
+"sender": "Bah",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 37,
+"categoryId": 2,
+"category": "Calendar",
+"icon": "calendar",
+"title": "Sync with Google Calendar",
+"description": "OAuth-based sync with Google Calendar",
+"sender": "Ilsan, Bah",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 38,
+"categoryId": 2,
+"category": "Calendar",
+"icon": "calendar",
+"title": "Google Calendar webhook",
+"description": "Real-time push updates from Google Calendar rather than polling",
+"sender": "Итан",
+"status": "in progress",
+"statusGroup": "in_progress",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 39,
+"categoryId": 2,
+"category": "Calendar",
+"icon": "calendar",
+"title": "Fetching events from Google Calendar API directly (not from device)",
+"description": "Events fetched from backend via Google Calendar API, not from the phone's local calendar store, to handle multiple Google accounts",
+"sender": "Bah, Asel",
+"status": "proposed (fix)",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 40,
+"categoryId": 2,
+"category": "Calendar",
+"icon": "calendar",
+"title": "Support for events created by other users / Calendly invites",
+"description": "Ensuring events where the user was invited (not created) still sync properly",
+"sender": "Ilsan",
+"status": "bug identified",
+"statusGroup": "in_progress",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 41,
+"categoryId": 2,
+"category": "Calendar",
+"icon": "calendar",
+"title": "\"AI scheduling button\" on proposed slot",
+"description": "Tap to confirm a GPT-suggested slot and add it to the main calendar",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 42,
+"categoryId": 2,
+"category": "Calendar",
+"icon": "calendar",
+"title": "Proposed time slots UI",
+"description": "Display GPT-suggested slots visually on the calendar",
+"sender": "Bah, Ilsan",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 43,
+"categoryId": 2,
+"category": "Calendar",
+"icon": "calendar",
+"title": "Remove / cancel proposed slot (X button)",
+"description": "",
+"sender": "Ilsan",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 44,
+"categoryId": 2,
+"category": "Calendar",
+"icon": "calendar",
+"title": "Moving proposed slot without triggering a popup",
+"description": "",
+"sender": "Ilsan",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 45,
+"categoryId": 2,
+"category": "Calendar",
+"icon": "calendar",
+"title": "Double-tap to confirm/schedule a proposed slot",
+"description": "",
+"sender": "Ilsan",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 46,
+"categoryId": 2,
+"category": "Calendar",
+"icon": "calendar",
+"title": "Create proposals from reminders (double tap on reminder)",
+"description": "",
+"sender": "Bah",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 47,
+"categoryId": 2,
+"category": "Calendar",
+"icon": "calendar",
+"title": "Switch calendar view (1/3/7 days) by pinch/zoom gesture",
+"description": "",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 48,
+"categoryId": 2,
+"category": "Calendar",
+"icon": "calendar",
+"title": "All-day tasks displayed at top of day (like Google Calendar)",
+"description": "",
+"sender": "Ilsan, Kalys",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 49,
+"categoryId": 2,
+"category": "Calendar",
+"icon": "calendar",
+"title": "Calendar view for Moodle/LMS tasks alongside personal events",
+"description": "Unified calendar showing academic deadlines + personal events in one view",
+"sender": "Daniel, Ilsan",
+"status": "implemented (React Native web app)",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 50,
+"categoryId": 2,
+"category": "Calendar",
+"icon": "calendar",
+"title": "Task source tagging in calendar",
+"description": "Visually identify whether a task came from Moodle/course integration vs. manual entry",
+"sender": "Daniel",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 51,
+"categoryId": 2,
+"category": "Calendar",
+"icon": "calendar",
+"title": "start_date field for tasks",
+"description": "In addition to due_date, add a start_date field to allow scheduling work periods",
+"sender": "Kalys",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 52,
+"categoryId": 2,
+"category": "Calendar",
+"icon": "calendar",
+"title": "Visual flow chart / dependency graph for plans",
+"description": "Show tasks as a flow chart with edges representing event sequencing and success relationships",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 53,
+"categoryId": 2,
+"category": "Calendar",
+"icon": "calendar",
+"title": "Visual \"cubes\" showing days left before deadline",
+"description": "",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 54,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Task CRUD (create, read, update, delete)",
+"description": "Full task management",
+"sender": "Итан, Bah",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 55,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Mark task as done / completed (double tap to turn green)",
+"description": "",
+"sender": "Ilsan, Bah",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 56,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Unmark / restore completed task",
+"description": "",
+"sender": "Daniel, Kalys",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 57,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Archive completed tasks",
+"description": "",
+"sender": "Kalys, Daniel",
+"status": "discussed / deprioritized",
+"statusGroup": "discussed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 58,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Completed tasks remain visible (crossed out), not deleted",
+"description": "Tasks stay visible with strikethrough to give sense of accomplishment",
+"sender": "Ilsan",
+"status": "proposed (key UX principle)",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 59,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Keep 5 most recent completed items visible; auto-archive the rest",
+"description": "",
+"sender": "Kalys",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 60,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Task aging awareness / flag long-pending tasks",
+"description": "Highlight tasks that have lingered across multiple days",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 61,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Daily accomplishment count",
+"description": "Show how many tasks were completed per day",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 62,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Sub-task creation to help people start",
+"description": "Break large tasks into smaller sub-tasks to overcome procrastination",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 63,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Auto-generate an easy first sub-task",
+"description": "When user selects a task, Fibo auto-creates the smallest possible first step to reduce friction",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 64,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Task timer / Focus Session",
+"description": "User taps \"start\" on a task to begin a timer, possibly shown as a live notification timer",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 65,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "\"Do list for today\" separate from infinite to-do list",
+"description": "A daily filtered view of just today's tasks",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 66,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Drag task from to-do list into calendar to schedule it",
+"description": "Reward user for doing this action",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 67,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Grouping tasks by course/category/name",
+"description": "Tasks grouped by subject, class, or category label using Levenshtein distance",
+"sender": "Ilsan, Kalys",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 68,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Task categories CRUD",
+"description": "Full management of custom categories/lists for tasks (GTD-style: Next Actions, Waiting, Maybe, Ideas)",
+"sender": "Kalys",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 69,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Task sorting by [status, due_date]",
+"description": "",
+"sender": "Kalys",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 70,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Upload documents associated with a task",
+"description": "Attach PDFs, slides, docs to a task (e.g. \"study for exam\" → attach lecture notes)",
+"sender": "Daniel",
+"status": "proposed (user request)",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 71,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Visible completion history",
+"description": "Keep completed tasks visible to reinforce progress",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 72,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Task rewriting / iteration support",
+"description": "Allow rephrasing or editing unfinished tasks with a note on why it wasn't done",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 73,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Compact carryover system",
+"description": "Smart suggestion to carry over incomplete tasks with prompts for reflection",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 74,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Tactile/visual satisfaction on task completion",
+"description": "Satisfying animation, strikethrough, check sound when completing a task",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 75,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Automatically add emoji to task based on title",
+"description": "e.g. \"Math homework\" → \"Math homework ➗\"",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 76,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Siri shortcut to create tasks",
+"description": "",
+"sender": "Daniel",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 77,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Swipe mechanism for labeling tasks",
+"description": "Swipe to label length, priority, quality of a task slot (1–5 stars)",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 78,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Card stack / Tinder-like swipe to triage tasks",
+"description": "One-dimensional task review like GTD triage (do now, next, project, waiting, maybe)",
+"sender": "Kalys",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 79,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Show reality feature (overconfidence bias combater)",
+"description": "Show users their historical task completion rates and realistic productive hours remaining before a deadline",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 80,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Google Tasks integration",
+"description": "",
+"sender": "Kalys",
+"status": "planned (assigned to Daniel)",
+"statusGroup": "planned",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 81,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Tanstack Query (React Query) for network operations",
+"description": "Optimistic updates, caching, throttling for task operations",
+"sender": "Kalys",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 82,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Daily planning ritual (\"shutdown ceremony\")",
+"description": "Inspired by Sunsama: each morning (or night before), guide the user through a brief ritual of reviewing tasks, assigning them to focus blocks on the calendar, and setting a daily intention. At end of day, a \"shutdown\" flow marks the day complete and surfaces what to carry over",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "sunsama.com",
+"sourceUrl": "https://www.sunsama.com/"
+},
+{
+"id": 83,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "\"One Thing\" daily priority card",
+"description": "Each morning Fibo's AI surfaces a single \"if you do only one thing today, do this\" priority task, based on deadline urgency, energy data, and habit streaks. Reduces decision paralysis for overwhelmed students",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "youtu.be/CnQVe-nXq50",
+"sourceUrl": "https://youtu.be/CnQVe-nXq50"
+},
+{
+"id": 84,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Quick Add swipe-up with optional chips",
+"description": "Inspired by Todyapp: a swipe-up gesture surfaces a task entry sheet with category, deadline, and effort level as optional chips (not required fields), keeping task capture under 3 seconds for students mid-lecture",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "Todyapp Figma Kit",
+"sourceUrl": "https://www.figma.com/design/92xoy4bUEhPN6FvQLwEGwm/Todyapp"
+},
+{
+"id": 85,
+"categoryId": 3,
+"category": "Task Management",
+"icon": "check-square",
+"title": "Contextual note cards attached to tasks and events",
+"description": "Inspired by Noted: students attach a lightweight note card directly to any task or calendar event (lecture notes to a class block, a study strategy to a session), keeping context with the action rather than in a separate notes app",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "Noted Figma Kit",
+"sourceUrl": "https://www.figma.com/design/wPp4Wwy8aDP4wYNoJObBXg/Noted"
+},
+{
+"id": 86,
+"categoryId": 4,
+"category": "Health Data & Biometrics",
+"icon": "heart-pulse",
+"title": "HealthKit integration — retrieve all available health data",
+"description": "Steps, active energy, exercise minutes, body weight, sleep hours, heart rate. Last 2 weeks of data sent to backend",
+"sender": "Bah, Ilsan",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 87,
+"categoryId": 4,
+"category": "Health Data & Biometrics",
+"icon": "heart-pulse",
+"title": "Sleep analysis from HealthKit",
+"description": "In-bed time, asleep stages (Core/Deep/REM), awake periods, time to fall asleep",
+"sender": "Bah",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 88,
+"categoryId": 4,
+"category": "Health Data & Biometrics",
+"icon": "heart-pulse",
+"title": "Send health data to backend",
+"description": "Backend endpoint to receive HealthKit data array",
+"sender": "Asel, Bah",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 89,
+"categoryId": 4,
+"category": "Health Data & Biometrics",
+"icon": "heart-pulse",
+"title": "Display screen time data in app",
+"description": "Show how long user has used phone, per-app usage time (display only; manipulation not allowed by Apple)",
+"sender": "Ilsan, Bah",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 90,
+"categoryId": 4,
+"category": "Health Data & Biometrics",
+"icon": "heart-pulse",
+"title": "Screen time lock / app usage limit",
+"description": "Lock the screen or block apps when a certain usage limit is reached. References Apple Screen Time API",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 91,
+"categoryId": 4,
+"category": "Health Data & Biometrics",
+"icon": "heart-pulse",
+"title": "GPS / location data collection",
+"description": "Fetch user coordinates periodically",
+"sender": "Ilsan, Bah",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 92,
+"categoryId": 4,
+"category": "Health Data & Biometrics",
+"icon": "heart-pulse",
+"title": "Parental controls research",
+"description": "",
+"sender": "Ilsan",
+"status": "proposed (for investigation)",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 93,
+"categoryId": 4,
+"category": "Health Data & Biometrics",
+"icon": "heart-pulse",
+"title": "Oura Ring integration",
+"description": "Use Oura's developer API for health/sleep data. Specifically: use Readiness score and sleep stage data to surface \"your body is recovered — good day for a heavy study session\" or \"low readiness — keep it light today\" suggestions",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": "cloud.ouraring.com/docs",
+"sourceUrl": "https://cloud.ouraring.com/docs/"
+},
+{
+"id": 94,
+"categoryId": 4,
+"category": "Health Data & Biometrics",
+"icon": "heart-pulse",
+"title": "WHOOP integration",
+"description": "Use WHOOP developer API. Map WHOOP strain and recovery scores to scheduling recommendations: high strain day → schedule lighter cognitive tasks; high recovery → schedule intensive deep work blocks",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": "developer.whoop.com/api",
+"sourceUrl": "https://developer.whoop.com/api/"
+},
+{
+"id": 95,
+"categoryId": 4,
+"category": "Health Data & Biometrics",
+"icon": "heart-pulse",
+"title": "Garmin integration",
+"description": "Use Garmin activity API. Auto-detect workout completions and suggest optimal post-exercise study windows (research shows ~2h post-workout is peak focus time)",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": "developer.garmin.com",
+"sourceUrl": "https://developer.garmin.com/gc-developer-program/activity-api/"
+},
+{
+"id": 96,
+"categoryId": 4,
+"category": "Health Data & Biometrics",
+"icon": "heart-pulse",
+"title": "Heart rate + location + schedule correlation",
+"description": "Combine GPS, health, and calendar data for deeper reports",
+"sender": "Итан, Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 97,
+"categoryId": 4,
+"category": "Health Data & Biometrics",
+"icon": "heart-pulse",
+"title": "Personalized story / article based on user health data",
+"description": "Use health data to surface relevant stories to the user",
+"sender": "Asel",
+"status": "proposed (issue ticket created)",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 98,
+"categoryId": 4,
+"category": "Health Data & Biometrics",
+"icon": "heart-pulse",
+"title": "Wellness check-ins (mood + energy + sleep quality)",
+"description": "Inspired by Finch: daily micro check-in (takes 10 seconds) asking how the user feels and their energy level. Correlate these self-reports with task completion rates over time to surface insights like \"you complete 40% more tasks on days you rate energy 4+\"",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "Finch app",
+"sourceUrl": "https://app.befinch.com"
+},
+{
+"id": 99,
+"categoryId": 4,
+"category": "Health Data & Biometrics",
+"icon": "heart-pulse",
+"title": "One-tap Physiological Sigh Break",
+"description": "Accessible from the lock screen widget or notification: a 60-second guided double-inhale / full-exhale animation with haptic breath cues. Auto-triggers before high-stakes calendar events (exams, presentations) detected on the student's schedule",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "youtu.be/rBdhqBGqiMc",
+"sourceUrl": "https://www.youtube.com/watch?v=rBdhqBGqiMc"
+},
+{
+"id": 100,
+"categoryId": 4,
+"category": "Health Data & Biometrics",
+"icon": "heart-pulse",
+"title": "Screen Curfew",
+"description": "Activates a blue-light filter and dims Fibo notifications starting 90 minutes before the student's set bedtime (informed by their sleep goal in HealthKit). Inspired by Daylight Computer's circadian health philosophy",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "daylightcomputer.com",
+"sourceUrl": "https://daylightcomputer.com"
+},
+{
+"id": 101,
+"categoryId": 4,
+"category": "Health Data & Biometrics",
+"icon": "heart-pulse",
+"title": "Mood check-in after habit completion",
+"description": "After logging a habit, Fibo asks for a 1-tap emoji mood rating. Builds a personal correlation graph over time (e.g., \"You feel 40% better on days you exercise before noon\"), making the health-productivity connection visible",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "Habitly Figma Kit",
+"sourceUrl": "https://www.figma.com/proto/uNyzOT9UBDeupv2v3uFMez/Habitly"
+},
+{
+"id": 102,
+"categoryId": 5,
+"category": "Location & Context Awareness",
+"icon": "map-pin",
+"title": "Location-to-task association",
+"description": "If a user's location correlates with a task's scheduled time more than once, auto-assign that location to the task (with user confirmation)",
+"sender": "Эмирлан, Ilsan",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 103,
+"categoryId": 5,
+"category": "Location & Context Awareness",
+"icon": "map-pin",
+"title": "Auto-complete task by location",
+"description": "If user is at the assigned location at task time, change task state to COMPLETE_BY_LOCATION",
+"sender": "Эмирлан",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 104,
+"categoryId": 5,
+"category": "Location & Context Awareness",
+"icon": "map-pin",
+"title": "Manual location setting for any task",
+"description": "User can manually assign a location to a task",
+"sender": "Эмирлан",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 105,
+"categoryId": 5,
+"category": "Location & Context Awareness",
+"icon": "map-pin",
+"title": "Geocoder / address from coordinates",
+"description": "Use geocoder to get human-readable place names from GPS coordinates (e.g. \"Starbucks on Main St.\") for log display",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 106,
+"categoryId": 5,
+"category": "Location & Context Awareness",
+"icon": "map-pin",
+"title": "Detect when phone is picked up and put down",
+"description": "Use this signal to understand user's availability or activity state",
+"sender": "Bah",
+"status": "researched",
+"statusGroup": "researched",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 107,
+"categoryId": 5,
+"category": "Location & Context Awareness",
+"icon": "map-pin",
+"title": "Grouping events by name using Levenshtein distance",
+"description": "Recurring event grouping using string similarity (threshold distance of 2) run as a background hourly process",
+"sender": "Эмирлан",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 108,
+"categoryId": 5,
+"category": "Location & Context Awareness",
+"icon": "map-pin",
+"title": "Heart rate + location + schedule correlation",
+"description": "Combine GPS, health, and calendar data for deeper reports",
+"sender": "Итан, Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 109,
+"categoryId": 5,
+"category": "Location & Context Awareness",
+"icon": "map-pin",
+"title": "Zenly \"bump\" feature for students",
+"description": "When two students meet physically, they bump phones to create a joint study session or confirm they met; get streak reward",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 110,
+"categoryId": 6,
+"category": "Notifications & Live Activities",
+"icon": "bell",
+"title": "Reminders feature",
+"description": "Set reminders on tasks/events",
+"sender": "Bah",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 111,
+"categoryId": 6,
+"category": "Notifications & Live Activities",
+"icon": "bell",
+"title": "Push notifications",
+"description": "Standard push notifications for tasks/events",
+"sender": "Bah, Kalys",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 112,
+"categoryId": 6,
+"category": "Notifications & Live Activities",
+"icon": "bell",
+"title": "Live Activity (iOS Dynamic Island / Lock Screen progress bar)",
+"description": "Show a progress bar on lock screen while an event is ongoing (like a delivery timer). Car-loading animation showing time elapsed/remaining",
+"sender": "Ilsan, Bah",
+"status": "researched",
+"statusGroup": "researched",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 113,
+"categoryId": 6,
+"category": "Notifications & Live Activities",
+"icon": "bell",
+"title": "Workaround for Live Activity: send regular push → user taps → app opens → Live Activity starts",
+"description": "",
+"sender": "Bah",
+"status": "proposed (solution to foreground constraint)",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 114,
+"categoryId": 6,
+"category": "Notifications & Live Activities",
+"icon": "bell",
+"title": "Live Activity UI with feedback button",
+"description": "Live notification banner with feedback capability overlaid",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 115,
+"categoryId": 6,
+"category": "Notifications & Live Activities",
+"icon": "bell",
+"title": "Duolingo-style push notification layout",
+"description": "Custom notification layouts with character/humor",
+"sender": "Kalys",
+"status": "proposed (inspiration)",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 116,
+"categoryId": 6,
+"category": "Notifications & Live Activities",
+"icon": "bell",
+"title": "Sarcastic/funny/personalized push notifications",
+"description": "\"Mean\" reminders with humor and sarcasm based on task subject matter (e.g. chemistry jokes for chemistry homework)",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 117,
+"categoryId": 6,
+"category": "Notifications & Live Activities",
+"icon": "bell",
+"title": "Notification when Moodle page for a class is updated",
+"description": "Alert students when a professor modifies their course page (new assignments, announcements)",
+"sender": "Daniel",
+"status": "proposed (professor suggestion)",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 118,
+"categoryId": 6,
+"category": "Notifications & Live Activities",
+"icon": "bell",
+"title": "Notify student when classmates start submitting assignments",
+"description": "\"Over 70% of your class has turned in the assignment, what's up with you?\"",
+"sender": "Daniel",
+"status": "proposed (professor suggestion)",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 119,
+"categoryId": 6,
+"category": "Notifications & Live Activities",
+"icon": "bell",
+"title": "Deadline clustering notification",
+"description": "If multiple deadlines fall on the same day, proactively notify user and suggest scheduling study sessions earlier",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 120,
+"categoryId": 6,
+"category": "Notifications & Live Activities",
+"icon": "bell",
+"title": "BeReal-style micro-task notification",
+"description": "Send user a random under-5-minute task during free time; give a reward for completing it quickly",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 121,
+"categoryId": 6,
+"category": "Notifications & Live Activities",
+"icon": "bell",
+"title": "iOS Widget",
+"description": "Home screen widget showing streak status, daily motivational quote. Sample: \"Day 18: You vs. procrastination — still undefeated.\"",
+"sender": "Kalys",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 122,
+"categoryId": 6,
+"category": "Notifications & Live Activities",
+"icon": "bell",
+"title": "Statsig feature gates",
+"description": "Feature flagging system for controlled rollout of new features",
+"sender": "Kalys",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 123,
+"categoryId": 6,
+"category": "Notifications & Live Activities",
+"icon": "bell",
+"title": "\"Focus Shield\" — gamified app blocking during study sessions",
+"description": "Inspired by Brainrot: when a focus session starts, distracting apps are blocked and a visual \"shield\" or avatar is shown on screen. The shield cracks if the user breaks focus. Animated reward (confetti, points) for completing the session unbroken",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "Brainrot app",
+"sourceUrl": "https://apps.apple.com/us/app/brainrot-screen-time-control/id6744338972"
+},
+{
+"id": 124,
+"categoryId": 6,
+"category": "Notifications & Live Activities",
+"icon": "bell",
+"title": "Passive stress detection micro-intervention",
+"description": "Opt-in: Fibo uses Apple Watch HRV to detect elevated stress mid-day and proactively pushes a micro-intervention (90-second breathing prompt or task re-prioritization nudge) without the user needing to open the app. Inspired by the Friend AI wearable concept",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "youtu.be/O_Q1hoEhfk4",
+"sourceUrl": "https://youtu.be/O_Q1hoEhfk4"
+},
+{
+"id": 125,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Streak system",
+"description": "Daily streak for completing tasks above a user-defined threshold (e.g. 50% completion rate per day)",
+"sender": "Daniel, Ilsan, Kalys",
+"status": "planned / in progress",
+"statusGroup": "in_progress",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 126,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Friend streaks",
+"description": "Maintain a streak between two friends, like Snapchat streaks. Forces users back on days they don't want to \"for the sake of friendship.\"",
+"sender": "Ilsan",
+"status": "planned (confirmed next major feature)",
+"statusGroup": "planned",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 127,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Invite friend directly to a friend streak",
+"description": "",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 128,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Inactive vs. active streak visual states",
+"description": "",
+"sender": "Daniel",
+"status": "implemented (visuals only)",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 129,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Points system",
+"description": "Earn points for completing tasks; bonus points for completing far ahead of deadline; fewer points for last-minute completion",
+"sender": "Daniel, Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 130,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Leaderboard",
+"description": "Competitive ranking using accumulated points",
+"sender": "Daniel",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 131,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Tiered ranking system",
+"description": "Levels/tiers unlocked by points",
+"sender": "Daniel",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 132,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Streak fire emoji animation",
+"description": "When completing/adding a task, a fire emoji drops down from streak counter and bounces back up",
+"sender": "Ilsan",
+"status": "proposed (UI concept)",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 133,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "All-or-nothing streak",
+"description": "Streak is only maintained if user hits 100% of their goal for the day",
+"sender": "Kalys",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 134,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Proof-of-completion / image verification",
+"description": "User sends a photo (e.g. from the gym) and GPT verifies it to award points",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 135,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Friend-verified task completion",
+"description": "Ask a friend to verify your task instead of/in addition to AI verification",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 136,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Quiz-based task verification",
+"description": "Generate a short quiz to semi-verify task completion (e.g. studied for exam → quiz on the material)",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 137,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Reward for labeling data / contributing to the model",
+"description": "After labeling a data point, visually show the contribution to the model (progress bar). Streak fire appears for labeling",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 138,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Personalized reward message based on task title",
+"description": "Reward message is contextually generated from the specific task completed",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 139,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Virtual character companion (beaver named Fibo)",
+"description": "A beaver mascot that needs logs (completed tasks) to keep a bonfire going at night. Completing tasks keeps Fibo safe and warm",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 140,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Character options: snail (Fibonacci spiral) or beaver",
+"description": "Snail: Fibonacci spiral association, funny look. Beaver: smart, cute, good meme foundation",
+"sender": "Ilsan",
+"status": "proposed (exploring)",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 141,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "RPG skill tree / character progression",
+"description": "Users build a character and progress through a skill tree tied to completing real-life goals",
+"sender": "Kalys",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 142,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Side quests / main quests",
+"description": "Structure daily tasks as main goals and optional side-quests with dopamine rewards",
+"sender": "Kalys",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 143,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Optimal challenge system",
+"description": "App dynamically adjusts challenge level to keep user in \"flow state\" (not bored, not overwhelmed)",
+"sender": "Kalys",
+"status": "proposed (conceptual)",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 144,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Zenly \"bump\" feature for students",
+"description": "When two students meet physically, they bump phones to create a joint study session; get streak reward",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 145,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Money in the pool / stakes",
+"description": "Users put money on the line to motivate task completion",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 146,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Forest-style timer gamification",
+"description": "Like the Forest app, grow something while doing focused work",
+"sender": "Ilsan",
+"status": "referenced (inspiration)",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 147,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Mean/sarcastic to-do list",
+"description": "Gamified to-do where user gets points but also receives \"mean\" feedback for completing tasks (humorous)",
+"sender": "Ilsan",
+"status": "proposed (inspiration)",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 148,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Accountable friend / snitch mechanic",
+"description": "If user doesn't complete a task, Fibo notifies their accountability partner",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 149,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Reward for scheduling (dragging task to calendar)",
+"description": "",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 150,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Session quality rating (1–5 scale)",
+"description": "After a focus session timer ends, a non-intrusive prompt asking how the session went",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 151,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Progress bar showing how much the assistant has \"learned\" about you",
+"description": "Motivate users to keep interacting so Fibo gets smarter; gamify data contribution",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 152,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Brainrot-style screen time control",
+"description": "\"Gen Z\"-flavored phone screen time management",
+"sender": "Ilsan",
+"status": "referenced (inspiration)",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 153,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Quest chain system (Respawn-inspired)",
+"description": "Completing daily tasks unlocks the next \"quest\" in a chain, each with increasing difficulty and reward. Chains could be themed (e.g. \"Exam Sprint\", \"Healthy Week\"). Friends can be invited to join the same quest chain",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "respawn.pro",
+"sourceUrl": "https://respawn.pro/"
+},
+{
+"id": 154,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Octalysis 8-core gamification framework",
+"description": "Redesign the entire reward system using all 8 motivational drives: Epic Meaning (studying for your future), Accomplishment (XP/badges), Creativity (custom study plans), Ownership (personalized schedule), Social Influence (friend leaderboards), Scarcity (limited daily streak shields), Unpredictability (mystery rewards), Loss Avoidance (streak protection)",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "yukaichou.com/octalysis",
+"sourceUrl": "https://yukaichou.com/gamification-examples/octalysis-complete-gamification-framework/"
+},
+{
+"id": 155,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Atomic Habits framework integration",
+"description": "Inspired by the Atoms app: guide students through habit design using the 4 laws (make it obvious, attractive, easy, satisfying). Offer habit templates, milestone celebrations at streak milestones (7/21/66 days), and bite-sized science-backed tips on building study habits",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "Atoms app",
+"sourceUrl": "https://apps.apple.com/pl/app/atoms-from-atomic-habits/id6474421906"
+},
+{
+"id": 156,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Intermittent variable XP reward schedule",
+"description": "Inspired by Huberman's dopamine research: instead of awarding points for every task, occasionally give surprise bonus XP, loot drops, or \"power-up\" unlocks at random intervals to sustain long-term engagement without burning out the dopamine baseline",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "youtu.be/QmOF0crdyRU",
+"sourceUrl": "https://youtu.be/QmOF0crdyRU"
+},
+{
+"id": 157,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Character Sheet with persistent stats",
+"description": "Inspired by heyalbert's LiFE RPG: a screen showing the student's avatar with visible stat bars (Focus Power, Health Streak, Social XP, Academic Level) that update in real time as they complete tasks — making progress visible as a unified identity",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "youtu.be/EW8uhqEsNKc",
+"sourceUrl": "https://youtu.be/EW8uhqEsNKc"
+},
+{
+"id": 158,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Weekly Quest Board",
+"description": "AI generates 3–5 personalized weekly challenges (e.g., \"Complete 4 Pomodoro sessions,\" \"Sleep before midnight 5 nights,\" \"Walk 7,000 steps 3 days\") displayed as a quest log with an opt-in friend leaderboard",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "youtu.be/s6tLGo9yij0",
+"sourceUrl": "https://youtu.be/s6tLGo9yij0"
+},
+{
+"id": 159,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Cookie Jar — wins journal",
+"description": "A private log where students record personal victories (big or small). Fibo surfaces a random past win as a push notification during detected low-energy or high-stress periods (before exams, after missed streaks) as an in-app resilience boost",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "youtu.be/CEg1SG1TOr4",
+"sourceUrl": "https://youtu.be/CEg1SG1TOr4"
+},
+{
+"id": 160,
+"categoryId": 7,
+"category": "Gamification & Rewards",
+"icon": "trophy",
+"title": "Hook Model loop design",
+"description": "Map Fibo's entire daily touchpoint explicitly to Nir Eyal's Hook Model: external trigger (morning notification) → action (one-tap daily plan confirm) → variable reward (rotating XP bonus or insight) → investment (student fills own priorities, increasing switching cost)",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "Hooked — Nir Eyal",
+"sourceUrl": "https://www.amazon.com/Hooked-How-Build-Habit-Forming-Products/dp/1591847788"
+},
+{
+"id": 161,
+"categoryId": 8,
+"category": "LMS & Academic Integrations",
+"icon": "graduation-cap",
+"title": "Moodle integration",
+"description": "Sync assignments, deadlines, course calendars from Moodle LMS. Core feature; students at Albion College using it",
+"sender": "Daniel, Ilsan",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 162,
+"categoryId": 8,
+"category": "LMS & Academic Integrations",
+"icon": "graduation-cap",
+"title": "Moodle calendar URL export",
+"description": "Use Moodle's .ics export URL with user auth token to pull calendar events",
+"sender": "Ilsan",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 163,
+"categoryId": 8,
+"category": "LMS & Academic Integrations",
+"icon": "graduation-cap",
+"title": "Moodle calendar refresh (\"Fetch all calendar events\" button)",
+"description": "",
+"sender": "Kalys",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 164,
+"categoryId": 8,
+"category": "LMS & Academic Integrations",
+"icon": "graduation-cap",
+"title": "Moodle course enrollment management",
+"description": "Users select which courses they are enrolled in from Settings/Profile",
+"sender": "Daniel, Kalys",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 165,
+"categoryId": 8,
+"category": "LMS & Academic Integrations",
+"icon": "graduation-cap",
+"title": "Moodle site change monitoring / dynamic assignment detection",
+"description": "Detect when a professor modifies a Moodle course page mid-semester and notify students",
+"sender": "Daniel",
+"status": "proposed (professor suggestion)",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 166,
+"categoryId": 8,
+"category": "LMS & Academic Integrations",
+"icon": "graduation-cap",
+"title": "Canvas LMS integration",
+"description": "",
+"sender": "Kalys",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 167,
+"categoryId": 8,
+"category": "LMS & Academic Integrations",
+"icon": "graduation-cap",
+"title": "Gradescope integration",
+"description": "",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 168,
+"categoryId": 8,
+"category": "LMS & Academic Integrations",
+"icon": "graduation-cap",
+"title": "Pearson platform integration",
+"description": "Automatically pull homework deadlines from Pearson courseware",
+"sender": "Ilsan",
+"status": "proposed (long-term)",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 169,
+"categoryId": 8,
+"category": "LMS & Academic Integrations",
+"icon": "graduation-cap",
+"title": "Syllabus parsing to extract class schedule and assignment dates",
+"description": "Auto-extract recurring class times and deadlines from uploaded syllabi. Class schedule import also possible via Excel sheet",
+"sender": "Nomin, Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 170,
+"categoryId": 8,
+"category": "LMS & Academic Integrations",
+"icon": "graduation-cap",
+"title": "Student Information System (SIS) integration",
+"description": "Connect with PeopleSoft, Ellucian, etc",
+"sender": "Ilsan",
+"status": "researched",
+"statusGroup": "researched",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 171,
+"categoryId": 8,
+"category": "LMS & Academic Integrations",
+"icon": "graduation-cap",
+"title": "\"Select your school\" onboarding flow",
+"description": "User picks their institution and all courses from that school appear",
+"sender": "Daniel",
+"status": "proposed (future vision)",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 172,
+"categoryId": 8,
+"category": "LMS & Academic Integrations",
+"icon": "graduation-cap",
+"title": "User tour / onboarding tutorial",
+"description": "Interactive tour for new users explaining app features",
+"sender": "Kalys",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 173,
+"categoryId": 8,
+"category": "LMS & Academic Integrations",
+"icon": "graduation-cap",
+"title": "Full intro / onboarding flow",
+"description": "Multi-screen walkthrough onboarding",
+"sender": "Kalys",
+"status": "in progress",
+"statusGroup": "in_progress",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 174,
+"categoryId": 8,
+"category": "LMS & Academic Integrations",
+"icon": "graduation-cap",
+"title": "Onboarding survey",
+"description": "Collect user preferences during onboarding (wake time, habits, goals)",
+"sender": "Bah, Ilsan",
+"status": "implemented (UI done; API integration needed)",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 175,
+"categoryId": 8,
+"category": "LMS & Academic Integrations",
+"icon": "graduation-cap",
+"title": "MCP (Model Context Protocol) for Moodle/Canvas integration",
+"description": "",
+"sender": "Kalys",
+"status": "research todo",
+"statusGroup": "researched",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 176,
+"categoryId": 8,
+"category": "LMS & Academic Integrations",
+"icon": "graduation-cap",
+"title": "Auto-detect university from email domain at signup",
+"description": "Use the Hipo university domains list (open database of 9,000+ institutions with email domains) to automatically identify the student's school at sign-up. Auto-populate the correct Moodle URL, campus calendar, and institution-specific features",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "github.com/Hipo/university-domains-list",
+"sourceUrl": "https://github.com/Hipo/university-domains-list"
+},
+{
+"id": 177,
+"categoryId": 9,
+"category": "Articles & Content Feed",
+"icon": "newspaper",
+"title": "Articles / content feed page (\"Feed page\")",
+"description": "A feed of health and productivity articles with thumbnail, title, read time",
+"sender": "Итан, Bah, Эмирлан",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 178,
+"categoryId": 9,
+"category": "Articles & Content Feed",
+"icon": "newspaper",
+"title": "Articles grouped by section headers",
+"description": "Feed organized into groups like \"Common health issues\" / \"The latest\" with header label and type",
+"sender": "Bah, Эмирлан",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 179,
+"categoryId": 9,
+"category": "Articles & Content Feed",
+"icon": "newspaper",
+"title": "Article CRUD API",
+"description": "Full create/read/update/delete for articles with auth (admin Basic Auth for creation)",
+"sender": "Эмирлан",
+"status": "implemented (Swagger docs created)",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 180,
+"categoryId": 9,
+"category": "Articles & Content Feed",
+"icon": "newspaper",
+"title": "Article groups CRUD",
+"description": "Manage article groups/sections via API",
+"sender": "Эмирлан, Итан",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 181,
+"categoryId": 9,
+"category": "Articles & Content Feed",
+"icon": "newspaper",
+"title": "Article filtering",
+"description": "Filter articles by search text, author, tags, creation date range",
+"sender": "Эмирлан",
+"status": "implemented (/filter endpoint)",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 182,
+"categoryId": 9,
+"category": "Articles & Content Feed",
+"icon": "newspaper",
+"title": "Latest articles endpoint",
+"description": "",
+"sender": "Эмирлан",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 183,
+"categoryId": 9,
+"category": "Articles & Content Feed",
+"icon": "newspaper",
+"title": "Article recommendation by user interest tags",
+"description": "Use tags user is interested in (e.g. \"gym\") to filter and surface relevant articles",
+"sender": "Эмирлан",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 184,
+"categoryId": 9,
+"category": "Articles & Content Feed",
+"icon": "newspaper",
+"title": "OpenAI Embeddings for article recommendation",
+"description": "Use vector embeddings to semantically match articles to user interests",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 185,
+"categoryId": 9,
+"category": "Articles & Content Feed",
+"icon": "newspaper",
+"title": "Read time and view count on articles",
+"description": "",
+"sender": "Эмирлан",
+"status": "proposed (noted as needed)",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 186,
+"categoryId": 9,
+"category": "Articles & Content Feed",
+"icon": "newspaper",
+"title": "Instagram Stories-style UI for short content",
+"description": "Short health tips shown as stories at the top of the feed; swipe up to open full article. Dark blue background with white text",
+"sender": "Ilsan",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 187,
+"categoryId": 9,
+"category": "Articles & Content Feed",
+"icon": "newspaper",
+"title": "Stories from articles",
+"description": "Each article thumbnail doubles as story thumbnail; swipe-up links to full read",
+"sender": "Эмирлан, Ilsan",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 188,
+"categoryId": 9,
+"category": "Articles & Content Feed",
+"icon": "newspaper",
+"title": "Huberman Lab newsletter articles",
+"description": "Upload Huberman Lab content as articles/stories",
+"sender": "Ilsan",
+"status": "done",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 189,
+"categoryId": 9,
+"category": "Articles & Content Feed",
+"icon": "newspaper",
+"title": "Professor-written articles",
+"description": "Health science professors write and upload articles in markdown",
+"sender": "Ilsan, Эмирлан",
+"status": "partially done",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 190,
+"categoryId": 9,
+"category": "Articles & Content Feed",
+"icon": "newspaper",
+"title": "Medium.com for hosting articles",
+"description": "Publish on Medium for credibility, then link in app vs. host internally. Considered and rejected in favor of markdown/internal hosting",
+"sender": "Эмирлан",
+"status": "rejected",
+"statusGroup": "rejected",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 191,
+"categoryId": 9,
+"category": "Articles & Content Feed",
+"icon": "newspaper",
+"title": "Web interface for article management",
+"description": "A proper CMS web UI for authors to create/manage articles (instead of Postman)",
+"sender": "Эмирлан, Итан",
+"status": "proposed (deferred)",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 192,
+"categoryId": 9,
+"category": "Articles & Content Feed",
+"icon": "newspaper",
+"title": "Syllabus Radio — AI-generated podcast",
+"description": "Two AI \"people\" discuss topics from syllabuses; includes news, ads, even songs",
+"sender": "Kalys",
+"status": "proposed (creative idea)",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 193,
+"categoryId": 10,
+"category": "Auth & User Management",
+"icon": "shield",
+"title": "Google Sign-In (OAuth)",
+"description": "Firebase-based Google authentication on iOS",
+"sender": "Bah, Итан",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 194,
+"categoryId": 10,
+"category": "Auth & User Management",
+"icon": "shield",
+"title": "Sign in with Apple",
+"description": "Required for App Store approval",
+"sender": "Kalys",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 195,
+"categoryId": 10,
+"category": "Auth & User Management",
+"icon": "shield",
+"title": "Backend JWT/token authentication",
+"description": "",
+"sender": "Итан",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 196,
+"categoryId": 10,
+"category": "Auth & User Management",
+"icon": "shield",
+"title": "Account deletion feature",
+"description": "Required by Apple App Store review. Includes confirmation modal and session token clear",
+"sender": "Kalys, Daniel",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 197,
+"categoryId": 10,
+"category": "Auth & User Management",
+"icon": "shield",
+"title": "User permission service (iOS)",
+"description": "Handle runtime permissions (location, health, notifications) with DI integration",
+"sender": "Bah",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 198,
+"categoryId": 10,
+"category": "Auth & User Management",
+"icon": "shield",
+"title": "Restrict app to specific institution email domains",
+"description": "Only allow students from selected schools to create accounts (as App Store distribution strategy)",
+"sender": "Kalys",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 199,
+"categoryId": 10,
+"category": "Auth & User Management",
+"icon": "shield",
+"title": "Non-Albion email support for sign-up",
+"description": "Remove restriction to institutional email",
+"sender": "Ilsan",
+"status": "in progress (during launch)",
+"statusGroup": "in_progress",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 200,
+"categoryId": 11,
+"category": "Reports & Analytics",
+"icon": "bar-chart-3",
+"title": "Visual health/productivity report",
+"description": "Charts and graphs showing health data, screen time, productivity patterns",
+"sender": "Bah, Ilsan",
+"status": "in progress",
+"statusGroup": "in_progress",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 201,
+"categoryId": 11,
+"category": "Reports & Analytics",
+"icon": "bar-chart-3",
+"title": "Pie chart and bar chart for health data",
+"description": "",
+"sender": "Bah",
+"status": "implemented (UI)",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 202,
+"categoryId": 11,
+"category": "Reports & Analytics",
+"icon": "bar-chart-3",
+"title": "Spotify-style \"Wrapped\" year review",
+"description": "Periodic summary of user's year/month in terms of productivity, habits, health",
+"sender": "Ilsan",
+"status": "proposed (long-term vision)",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 203,
+"categoryId": 11,
+"category": "Reports & Analytics",
+"icon": "bar-chart-3",
+"title": "Monthly review of schedule",
+"description": "Edges/relationships showing \"did event B happen after event A?\" Visualize routine patterns",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 204,
+"categoryId": 11,
+"category": "Reports & Analytics",
+"icon": "bar-chart-3",
+"title": "Task completion prediction",
+"description": "Predict whether user will complete an upcoming task based on patterns",
+"sender": "Итан",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 205,
+"categoryId": 11,
+"category": "Reports & Analytics",
+"icon": "bar-chart-3",
+"title": "Weekly review dashboard",
+"description": "Summary of study hours, tasks completed, upcoming deadlines, test scores, with suggestions for the next week",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 206,
+"categoryId": 11,
+"category": "Reports & Analytics",
+"icon": "bar-chart-3",
+"title": "Task classification",
+"description": "Classify/tag tasks by type (work, health, social, academic) automatically",
+"sender": "Итан",
+"status": "in progress",
+"statusGroup": "in_progress",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 207,
+"categoryId": 11,
+"category": "Reports & Analytics",
+"icon": "bar-chart-3",
+"title": "Schedule quality score",
+"description": "AI rates how efficiently the user's schedule is arranged",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 208,
+"categoryId": 11,
+"category": "Reports & Analytics",
+"icon": "bar-chart-3",
+"title": "Task-to-energy-peak matching",
+"description": "Suggest scheduling high-effort tasks during the user's peak energy hours",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 209,
+"categoryId": 11,
+"category": "Reports & Analytics",
+"icon": "bar-chart-3",
+"title": "Finance + time budgeting",
+"description": "Explore relationship between financial habits and time management, especially for college students",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 210,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "Tab bar navigation (bottom tabs)",
+"description": "",
+"sender": "Bah, Kalys",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 211,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "Audio/voice input button",
+"description": "Microphone button before text entry; switches to send button after text is entered",
+"sender": "Ilsan, Bah",
+"status": "implemented (bug fix applied)",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 212,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "Screen time display in report chart format",
+"description": "Use fetched screen time data visualized in charts",
+"sender": "Bah",
+"status": "in progress",
+"statusGroup": "in_progress",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 213,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "Dark blue background with white text for stories (no background image)",
+"description": "",
+"sender": "Ilsan",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 214,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "\"Juicy\" Duolingo-inspired design language",
+"description": "Brighter colors, rounder corners, cuter/friendlier mascot applied across app",
+"sender": "Ilsan",
+"status": "proposed (design direction)",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 215,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "Anthropic-style design (colors, fonts, button shapes)",
+"description": "Use Anthropic UI Kit from Figma as design system base",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 216,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "ClashGrotesk font",
+"description": "",
+"sender": "Daniel",
+"status": "implemented (landing page)",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 217,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "Pomodoro timer UI",
+"description": "Standard 25-min work / 5-min break timer",
+"sender": "Ilsan, Kalys",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 218,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "Confetti animation on task completion",
+"description": "",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 219,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "Rive.app for mobile animations",
+"description": "High-performance animation library (used by Duolingo); for animating the character, streaks, transitions. Rive supports state machines so the beaver mascot can react to user actions (idle → excited → celebrating) in real time",
+"sender": "Daniel, Kalys",
+"status": "proposed (strongly recommended)",
+"statusGroup": "proposed",
+"source": "rive.app",
+"sourceUrl": "https://rive.app/"
+},
+{
+"id": 220,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "Aceternity UI components for web landing page",
+"description": "Pre-built animated React components (beam effects, card glows, floating elements). Use for a visually striking landing page without building animations from scratch",
+"sender": "Daniel",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": "ui.aceternity.com",
+"sourceUrl": "https://ui.aceternity.com/components"
+},
+{
+"id": 221,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "Focusify Pomodoro UI Kit (design reference)",
+"description": "Figma Pomodoro task management UI kit with clean timer interface, task list alongside timer, progress rings. Use as design reference when building Fibo's focus session / timer screen",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "Focusify on Figma Community",
+"sourceUrl": "https://www.figma.com/community/file/1304837596501145518/focusify"
+},
+{
+"id": 222,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "Reactive mascot animations (Duolingo-style)",
+"description": "Implement Fibo's beaver/character using Rive state machines so it reacts in real time: nodding when a task is checked, looking concerned when a deadline approaches, full celebration animation when a streak milestone is hit. Based on Duolingo's animation tech",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "youtu.be/fgOqvyPif3g",
+"sourceUrl": "https://youtu.be/fgOqvyPif3g"
+},
+{
+"id": 223,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "Selectable AI companion personality",
+"description": "Inspired by Duolingo's character ecosystem: let users choose their Fibo companion from a small roster with distinct coaching personalities (e.g., \"Tough Love\" drill sergeant vs. \"Hype Friend\" encourager), each with different notification tone and reward language",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "youtu.be/m-3-D7S0piw",
+"sourceUrl": "https://youtu.be/m-3-D7S0piw"
+},
+{
+"id": 224,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "Modular \"block-building\" schedule UI",
+"description": "Inspired by LEGO's psychology: users assemble their daily plan from draggable visual tiles rather than receiving a fully AI-generated schedule. Creates an IKEA-effect sense of ownership that increases follow-through",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "youtu.be/b7I8OVXn7wY",
+"sourceUrl": "https://youtu.be/b7I8OVXn7wY"
+},
+{
+"id": 225,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "Anthropic UI Kit as AI coach interface foundation",
+"description": "Use Anthropic's Figma UI Kit (designed for Claude/MCP experiences) as the component foundation for Fibo's AI coach chat interface, ensuring interaction patterns feel native and enabling faster MCP integration later",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "Anthropic UI Kit",
+"sourceUrl": "https://www.figma.com/design/uR4h2CbMT7uFFLEn0xmKPi/Anthropic-UI-Kit"
+},
+{
+"id": 226,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "Positive empty-state illustrations",
+"description": "Use the free Email & Productivity Figma illustration set for Fibo's empty states (e.g., \"No tasks today — enjoy the rest!\"). Reduces anxiety when students open the app to nothing, reinforcing a positive emotional relationship with the product",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "Email & Productivity Illustrations",
+"sourceUrl": "https://www.figma.com/design/wot1qrSGbxCBg3pqUKkbm8/-FREE--Email---Productivity-Illustrations"
+},
+{
+"id": 227,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "Taskify pre-built goal template library",
+"description": "Ship Fibo with 20+ college-specific goal templates (e.g., \"Ace finals week,\" \"Build a morning routine,\" \"Train for 5K\") students one-tap to activate during onboarding, dramatically reducing time-to-first-value",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "Taskify Figma Kit",
+"sourceUrl": "https://www.figma.com/design/H67Bxd64J40cyVZvwvo1aN/Taskify"
+},
+{
+"id": 228,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "Error boundary component for root app",
+"description": "",
+"sender": "Kalys",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 229,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "Intro/onboarding screens (multi-step)",
+"description": "",
+"sender": "Kalys",
+"status": "WIP pushed",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 230,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "Paywall / subscription UI",
+"description": "Paywall screen after 2-week free trial",
+"sender": "Bah, Ilsan",
+"status": "implemented (AppHud integration)",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 231,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "Color-coded calendar",
+"description": "Different colors for different task types / \"brain-rottedness\" levels",
+"sender": "Daniel",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 232,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "Task source label visible on task card",
+"description": "Show which course a task is from",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 233,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "Contact us page on landing website",
+"description": "Required for App Store review",
+"sender": "Kalys",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 234,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "Privacy policy and terms on landing page",
+"description": "",
+"sender": "Kalys, Ilsan",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 235,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "Landing page redesign / new illustrations",
+"description": "",
+"sender": "Daniel",
+"status": "in progress (Figma mockup created)",
+"statusGroup": "in_progress",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 236,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "App icon design",
+"description": "",
+"sender": "Bah, Ilsan, Murat",
+"status": "in progress (temporary icon added; designer working on it)",
+"statusGroup": "in_progress",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 237,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "iPhone and iPad screenshots for App Store",
+"description": "",
+"sender": "Kalys",
+"status": "required",
+"statusGroup": "planned",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 238,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "\"Try Fibo\" CTA button on landing page (linking to fibo.today)",
+"description": "",
+"sender": "Ilsan",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 239,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "Sign-in redirect",
+"description": "When users visit app.fibo.today, take them directly to sign-in page",
+"sender": "Ilsan",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 240,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "Enrollment removal/management UI",
+"description": "",
+"sender": "Daniel",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 241,
+"categoryId": 12,
+"category": "UI & UX",
+"icon": "palette",
+"title": "Subscriptions / in-app purchases",
+"description": "Monthly subscription with 2-week free trial (AppHud)",
+"sender": "Bah, Ilsan",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 242,
+"categoryId": 13,
+"category": "Backend & Infrastructure",
+"icon": "server",
+"title": "Node.js backend (initial)",
+"description": "Express-based backend with event/schedule endpoints",
+"sender": "Итан",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 243,
+"categoryId": 13,
+"category": "Backend & Infrastructure",
+"icon": "server",
+"title": "Migration to TypeScript (Node.js backend)",
+"description": "",
+"sender": "Asel",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 244,
+"categoryId": 13,
+"category": "Backend & Infrastructure",
+"icon": "server",
+"title": "Golang microservice for articles/GPS (monolith refactor)",
+"description": "Emirlan's Go-based articles + GPS service; merged into monolith using articles backend as base",
+"sender": "Эмирлан",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 245,
+"categoryId": 13,
+"category": "Backend & Infrastructure",
+"icon": "server",
+"title": "Ruby on Rails backend (new)",
+"description": "New backend-rb for tasks, streaks, user management",
+"sender": "Kalys",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 246,
+"categoryId": 13,
+"category": "Backend & Infrastructure",
+"icon": "server",
+"title": "Staging server",
+"description": "Separate dev/staging instance at dev.fibo.health",
+"sender": "Итан",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 247,
+"categoryId": 13,
+"category": "Backend & Infrastructure",
+"icon": "server",
+"title": "AWS EC2 for production",
+"description": "Main server hosted on AWS; moved to larger instance for more storage; later migrated to Hetzner",
+"sender": "Итан",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 248,
+"categoryId": 13,
+"category": "Backend & Infrastructure",
+"icon": "server",
+"title": "Hetzner dedicated server",
+"description": "Cost-effective alternative to AWS for production",
+"sender": "Kalys",
+"status": "investigated",
+"statusGroup": "researched",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 249,
+"categoryId": 13,
+"category": "Backend & Infrastructure",
+"icon": "server",
+"title": "Azure hosting",
+"description": "$5k (later $25k) in Azure credits from Microsoft program",
+"sender": "Ilsan",
+"status": "in use",
+"statusGroup": "in_progress",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 250,
+"categoryId": 13,
+"category": "Backend & Infrastructure",
+"icon": "server",
+"title": "OpenAI API via Azure credits",
+"description": "Route OpenAI API calls through Azure to use credits",
+"sender": "Ilsan",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 251,
+"categoryId": 13,
+"category": "Backend & Infrastructure",
+"icon": "server",
+"title": "GitHub Actions CI/CD",
+"description": "",
+"sender": "Итан, Kalys",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 252,
+"categoryId": 13,
+"category": "Backend & Infrastructure",
+"icon": "server",
+"title": "Continuous deployment to staging",
+"description": "",
+"sender": "Kalys",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 253,
+"categoryId": 13,
+"category": "Backend & Infrastructure",
+"icon": "server",
+"title": "Nginx configuration",
+"description": "Reverse proxy routing for microservices",
+"sender": "Эмирлан, Итан",
+"status": "implemented (routing issues noted)",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 254,
+"categoryId": 13,
+"category": "Backend & Infrastructure",
+"icon": "server",
+"title": "PostgreSQL database + migrations",
+"description": "",
+"sender": "Kalys",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 255,
+"categoryId": 13,
+"category": "Backend & Infrastructure",
+"icon": "server",
+"title": "MongoDB for AI/suggestions service",
+"description": "",
+"sender": "Asel",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 256,
+"categoryId": 13,
+"category": "Backend & Infrastructure",
+"icon": "server",
+"title": "Database backup and restore",
+"description": "Production DB was accidentally wiped during migration; restored from backup",
+"sender": "Kalys",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 257,
+"categoryId": 13,
+"category": "Backend & Infrastructure",
+"icon": "server",
+"title": "OpenAPI spec as shared source of truth",
+"description": "Separate fibo-api-contracts repo with OpenAPI YAML; all services must comply. Lifecycle: branch → review PR → merge → ship",
+"sender": "Kalys",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 258,
+"categoryId": 13,
+"category": "Backend & Infrastructure",
+"icon": "server",
+"title": "Swagger / interactive API docs",
+"description": "Each service has Swagger UI (articles, GPS, main backend)",
+"sender": "Эмирлан, Итан",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 259,
+"categoryId": 13,
+"category": "Backend & Infrastructure",
+"icon": "server",
+"title": "Sentry error tracking",
+"description": "Integrate Sentry for both backend and iOS",
+"sender": "Kalys",
+"status": "initiated",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 260,
+"categoryId": 13,
+"category": "Backend & Infrastructure",
+"icon": "server",
+"title": "Statsig for feature flagging and analytics",
+"description": "",
+"sender": "Kalys",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 261,
+"categoryId": 13,
+"category": "Backend & Infrastructure",
+"icon": "server",
+"title": "KeePassXC shared passwords file",
+"description": "Shared credential manager for the team",
+"sender": "Kalys",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 262,
+"categoryId": 13,
+"category": "Backend & Infrastructure",
+"icon": "server",
+"title": "Structured logging with request IDs and log levels (Go services)",
+"description": "",
+"sender": "Эмирлан",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 263,
+"categoryId": 13,
+"category": "Backend & Infrastructure",
+"icon": "server",
+"title": "Modular monolith architecture (vs. microservices)",
+"description": "Researched modular monolith pattern and Service Weaver as alternatives to full microservices",
+"sender": "Kalys",
+"status": "discussed; Go service merged into monolith",
+"statusGroup": "discussed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 264,
+"categoryId": 13,
+"category": "Backend & Infrastructure",
+"icon": "server",
+"title": "Background jobs (hourly event grouping process)",
+"description": "",
+"sender": "Эмирлан",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 265,
+"categoryId": 13,
+"category": "Backend & Infrastructure",
+"icon": "server",
+"title": "Zustand for state management (React Native)",
+"description": "",
+"sender": "Kalys",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 266,
+"categoryId": 13,
+"category": "Backend & Infrastructure",
+"icon": "server",
+"title": "MCP (Model Context Protocol) for Moodle/Canvas integration",
+"description": "",
+"sender": "Kalys",
+"status": "research todo",
+"statusGroup": "researched",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 267,
+"categoryId": 13,
+"category": "Backend & Infrastructure",
+"icon": "server",
+"title": "Statsig A/B testing for gamification mechanics",
+"description": "Use Statsig's experimentation layer (beyond just feature flags) to A/B test different gamification variants: e.g. test streak-based vs. points-based vs. social-pressure rewards to find what drives retention for college students",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "statsig.com",
+"sourceUrl": "https://www.statsig.com/pricing"
+},
+{
+"id": 268,
+"categoryId": 13,
+"category": "Backend & Infrastructure",
+"icon": "server",
+"title": "Optimistic UI updates for all task actions",
+"description": "Use TanStack Query's optimistic update pattern so every task action (complete, create, delete) reflects instantly in the UI with automatic rollback if the server call fails. Prevents the \"lag feeling\" that breaks immersion in productivity apps",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "tanstack.com/query optimistic updates",
+"sourceUrl": "https://tanstack.com/query/latest/docs/framework/react/guides/optimistic-updates"
+},
+{
+"id": 269,
+"categoryId": 13,
+"category": "Backend & Infrastructure",
+"icon": "server",
+"title": "Mandatory experiment flag for every feature",
+"description": "Inspired by Flo Health's build process (Dmitry Gurski): every new Fibo feature ships behind a Statsig experiment flag and runs a split test to validate retention impact before full rollout, preventing feature bloat",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "youtu.be/bgKavV8DMec",
+"sourceUrl": "https://youtu.be/bgKavV8DMec"
+},
+{
+"id": 270,
+"categoryId": 14,
+"category": "Food & Mood Tracking",
+"icon": "utensils",
+"title": "Meal logging via timestamped photo + ChatGPT thread",
+"description": "User photographs meals and logs them to a persistent ChatGPT thread; AI tracks calorie intake and nutrient groups over time",
+"sender": "Ben Fibo",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 271,
+"categoryId": 14,
+"category": "Food & Mood Tracking",
+"icon": "utensils",
+"title": "Mood/goal journaling thread",
+"description": "Separate ChatGPT thread where user logs how they feel and whether they met daily goals",
+"sender": "Ben Fibo",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 272,
+"categoryId": 14,
+"category": "Food & Mood Tracking",
+"icon": "utensils",
+"title": "Cross-thread AI insight",
+"description": "A third AI thread that reads both the food log and mood log and surfaces integrated insights about food/mood correlations",
+"sender": "Ben Fibo",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 273,
+"categoryId": 14,
+"category": "Food & Mood Tracking",
+"icon": "utensils",
+"title": "All-in-one food + mood + schedule AI in Fibo",
+"description": "Integrate food and mood tracking natively into the app alongside scheduling",
+"sender": "Ben Fibo, Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 274,
+"categoryId": 15,
+"category": "Social & Community",
+"icon": "users",
+"title": "Friend invite system",
+"description": "Invite friends to the app directly from within the app",
+"sender": "Ilsan",
+"status": "planned",
+"statusGroup": "planned",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 275,
+"categoryId": 15,
+"category": "Social & Community",
+"icon": "users",
+"title": "Referral link / invite to friend streak",
+"description": "",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 276,
+"categoryId": 15,
+"category": "Social & Community",
+"icon": "users",
+"title": "Social media presence",
+"description": "TikTok, Instagram Reels, Twitter, Facebook accounts for growth. Instagram account @fibo.ai created",
+"sender": "Daniel, Ilsan",
+"status": "initiated",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 277,
+"categoryId": 15,
+"category": "Social & Community",
+"icon": "users",
+"title": "\"Bump\" with friend phone to start joint study session",
+"description": "NFC or proximity-based bump to link two users for shared accountability",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 278,
+"categoryId": 15,
+"category": "Social & Community",
+"icon": "users",
+"title": "Community / social feed",
+"description": "Users can post, interact in a community tab (referenced HelloHabit community feature)",
+"sender": "Daniel",
+"status": "proposed (future)",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 279,
+"categoryId": 15,
+"category": "Social & Community",
+"icon": "users",
+"title": "Fibo \"ambassador\" program at colleges",
+"description": "Жетиген joined as AUCA ambassador; expand to other campuses",
+"sender": "Ilsan",
+"status": "initiated",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 280,
+"categoryId": 15,
+"category": "Social & Community",
+"icon": "users",
+"title": "Study group scheduling (Saturn-inspired)",
+"description": "Inspired by the Saturn app for students: allow groups of friends to share availability, find mutual free blocks, and schedule joint study sessions. Show a shared \"group calendar\" view where overlapping free time is highlighted",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "joinsaturn.com",
+"sourceUrl": "https://www.instagram.com/joinsaturn"
+},
+{
+"id": 281,
+"categoryId": 15,
+"category": "Social & Community",
+"icon": "users",
+"title": "Social habit sharing & accountability feed (HelloHabit-inspired)",
+"description": "Inspired by HelloHabit's community tab: let users share completed streaks or habit milestones with friends. Friends can react with encouragement. Creates lightweight social accountability without requiring a full social network",
+"sender": null,
+"status": "proposed (from link analysis)",
+"statusGroup": "proposed",
+"source": "HelloHabit app",
+"sourceUrl": "https://apps.apple.com/us/app/hellohabit-habit-tracker/id6476824223"
+},
+{
+"id": 282,
+"categoryId": 16,
+"category": "Business & Monetization",
+"icon": "briefcase",
+"title": "B2B model (sell to colleges/institutions)",
+"description": "Charge institutions rather than students directly; students get access through school",
+"sender": "Ilsan, Kalys",
+"status": "proposed (primary monetization direction)",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 283,
+"categoryId": 16,
+"category": "Business & Monetization",
+"icon": "briefcase",
+"title": "Monthly subscription with 2-week free trial",
+"description": "Consumer subscription model (fallback/parallel to B2B)",
+"sender": "Ilsan, Bah",
+"status": "implemented (paywall built with AppHud)",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 284,
+"categoryId": 16,
+"category": "Business & Monetization",
+"icon": "briefcase",
+"title": "Paid articles / content behind paywall",
+"description": "",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 285,
+"categoryId": 16,
+"category": "Business & Monetization",
+"icon": "briefcase",
+"title": "Gradescope / Pearson integration as premium feature",
+"description": "",
+"sender": "Ilsan",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 286,
+"categoryId": 16,
+"category": "Business & Monetization",
+"icon": "briefcase",
+"title": "Target market: college students",
+"description": "Hypothesis: school assignments create natural, recurring retention (unlike gym). Validated via user research",
+"sender": "Ilsan",
+"status": "validated",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 287,
+"categoryId": 16,
+"category": "Business & Monetization",
+"icon": "briefcase",
+"title": "Personal coach / wise assistant positioning",
+"description": "\"Empathetic personal assistant that helps you get your shit together.\"",
+"sender": "Ben Fibo, Ilsan",
+"status": "discussed",
+"statusGroup": "discussed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 288,
+"categoryId": 16,
+"category": "Business & Monetization",
+"icon": "briefcase",
+"title": "YC (Y Combinator) application",
+"description": "",
+"sender": "Ilsan",
+"status": "applied",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 289,
+"categoryId": 16,
+"category": "Business & Monetization",
+"icon": "briefcase",
+"title": "SkyDeck accelerator application",
+"description": "",
+"sender": "Ilsan",
+"status": "applied",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 290,
+"categoryId": 16,
+"category": "Business & Monetization",
+"icon": "briefcase",
+"title": "Perplexity Business Fellowship program",
+"description": "",
+"sender": "Ilsan",
+"status": "accepted",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 291,
+"categoryId": 16,
+"category": "Business & Monetization",
+"icon": "briefcase",
+"title": "Albion College marketing partnership",
+"description": "College's marketing office creating content/video ads about Fibo",
+"sender": "Ilsan",
+"status": "in progress",
+"statusGroup": "in_progress",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 292,
+"categoryId": 16,
+"category": "Business & Monetization",
+"icon": "briefcase",
+"title": "TechCrunch Disrupt participation",
+"description": "$7k entry fee; noted as aspirational",
+"sender": "Ilsan",
+"status": "proposed (not pursued at time of mention)",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 293,
+"categoryId": 16,
+"category": "Business & Monetization",
+"icon": "briefcase",
+"title": "Ad-Hoc / TestFlight distribution for institutional rollout",
+"description": "Distribute app to students via TestFlight invites (up to 10,000 users, 90-day build validity)",
+"sender": "Kalys",
+"status": "implemented (primary distribution channel)",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 294,
+"categoryId": 16,
+"category": "Business & Monetization",
+"icon": "briefcase",
+"title": "fibo.health domain",
+"description": "",
+"sender": "Ilsan",
+"status": "acquired",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 295,
+"categoryId": 16,
+"category": "Business & Monetization",
+"icon": "briefcase",
+"title": "FIBONACCI LABS LLC legal entity",
+"description": "",
+"sender": "Ilsan",
+"status": "formed",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 296,
+"categoryId": 17,
+"category": "Process & Tooling",
+"icon": "settings",
+"title": "GitHub Projects Kanban board for engineering tasks",
+"description": "",
+"sender": "Kalys",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 297,
+"categoryId": 17,
+"category": "Process & Tooling",
+"icon": "settings",
+"title": "Shape Up methodology",
+"description": "Appetite-based feature scoping instead of Agile/Kanban sprints (referenced Basecamp's Shape Up book)",
+"sender": "Kalys",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 298,
+"categoryId": 17,
+"category": "Process & Tooling",
+"icon": "settings",
+"title": "Daily standups (15 min, 2pm Bishkek time)",
+"description": "Text-based format: what I did, what I'm doing, blockers",
+"sender": "Ilsan, Kalys",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 299,
+"categoryId": 17,
+"category": "Process & Tooling",
+"icon": "settings",
+"title": "Code review sessions",
+"description": "",
+"sender": "Эмирлан, Kalys",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 300,
+"categoryId": 17,
+"category": "Process & Tooling",
+"icon": "settings",
+"title": "Bridges Framework for product discovery",
+"description": "Sessions to collect ideas, define problems, identify risks",
+"sender": "Kalys",
+"status": "proposed",
+"statusGroup": "proposed",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 301,
+"categoryId": 17,
+"category": "Process & Tooling",
+"icon": "settings",
+"title": "TestFlight for internal + external testing",
+"description": "",
+"sender": "Bah, Kalys",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 302,
+"categoryId": 17,
+"category": "Process & Tooling",
+"icon": "settings",
+"title": "Expo / EAS Build for React Native app distribution",
+"description": "",
+"sender": "Итан, Kalys",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 303,
+"categoryId": 17,
+"category": "Process & Tooling",
+"icon": "settings",
+"title": "Deployment documentation in Notion",
+"description": "",
+"sender": "Kalys",
+"status": "initiated",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+},
+{
+"id": 304,
+"categoryId": 17,
+"category": "Process & Tooling",
+"icon": "settings",
+"title": "AppHud for subscription analytics",
+"description": "",
+"sender": "Bah",
+"status": "implemented",
+"statusGroup": "implemented",
+"source": null,
+"sourceUrl": null
+}
+];
+
+function featureExplorer() {
+  return {
+    features: FEATURES_DATA,
+    search: '',
+    activeStatuses: [],
+    activeCategory: 'all',
+    expandedIds: [],
+    showAllCategories: [],
+    defaultShowCount: 6,
+
+    categories: [
+      {id:1,name:"Scheduling & AI",icon:"brain"},
+      {id:2,name:"Calendar",icon:"calendar"},
+      {id:3,name:"Task Management",icon:"check-square"},
+      {id:4,name:"Health Data & Biometrics",icon:"heart-pulse"},
+      {id:5,name:"Location & Context Awareness",icon:"map-pin"},
+      {id:6,name:"Notifications & Live Activities",icon:"bell"},
+      {id:7,name:"Gamification & Rewards",icon:"trophy"},
+      {id:8,name:"LMS & Academic Integrations",icon:"graduation-cap"},
+      {id:9,name:"Articles & Content Feed",icon:"newspaper"},
+      {id:10,name:"Auth & User Management",icon:"shield"},
+      {id:11,name:"Reports & Analytics",icon:"bar-chart-3"},
+      {id:12,name:"UI & UX",icon:"palette"},
+      {id:13,name:"Backend & Infrastructure",icon:"server"},
+      {id:14,name:"Food & Mood Tracking",icon:"utensils"},
+      {id:15,name:"Social & Community",icon:"users"},
+      {id:16,name:"Business & Monetization",icon:"briefcase"},
+      {id:17,name:"Process & Tooling",icon:"settings"}
+    ],
+
+    statusOptions: [
+      {key:'implemented',label:'Implemented'},
+      {key:'in_progress',label:'In Progress'},
+      {key:'proposed',label:'Proposed'},
+      {key:'planned',label:'Planned'},
+      {key:'discussed',label:'Discussed'},
+      {key:'researched',label:'Researched'},
+      {key:'rejected',label:'Rejected'}
+    ],
+
+    get totalCount() { return this.filteredFeatures.length; },
+    get implementedCount() { return this.features.filter(f => f.statusGroup === 'implemented').length; },
+
+    get statusCounts() {
+      const counts = {};
+      for (const s of this.statusOptions) {
+        counts[s.key] = this.features.filter(f => f.statusGroup === s.key).length;
+      }
+      return counts;
+    },
+
+    get filteredFeatures() {
+      let ff = this.features;
+      if (this.activeStatuses.length > 0) {
+        ff = ff.filter(f => this.activeStatuses.includes(f.statusGroup));
+      }
+      if (this.search.trim()) {
+        const q = this.search.trim().toLowerCase();
+        ff = ff.filter(f =>
+          f.title.toLowerCase().includes(q) ||
+          (f.description && f.description.toLowerCase().includes(q)) ||
+          (f.sender && f.sender.toLowerCase().includes(q)) ||
+          f.category.toLowerCase().includes(q)
+        );
+      }
+      return ff;
+    },
+
+    getCategoryFeatures(catId) {
+      return this.filteredFeatures.filter(f => f.categoryId === catId);
+    },
+
+    getCategoryCount(catId) {
+      return this.getCategoryFeatures(catId).length;
+    },
+
+    getShowLimit(catId) {
+      return this.showAllCategories.includes(catId) ? 999 : this.defaultShowCount;
+    },
+
+    getVisibleFeatures(catId) {
+      const feats = this.getCategoryFeatures(catId);
+      const limit = this.getShowLimit(catId);
+      return feats.slice(0, limit);
+    },
+
+    toggleStatus(key) {
+      if (this.activeStatuses.includes(key)) {
+        this.activeStatuses = this.activeStatuses.filter(s => s !== key);
+      } else {
+        this.activeStatuses.push(key);
+      }
+    },
+
+    toggleExpand(id) {
+      if (this.expandedIds.includes(id)) {
+        this.expandedIds = this.expandedIds.filter(i => i !== id);
+      } else {
+        this.expandedIds.push(id);
+      }
+    },
+
+    toggleShowAll(catId) {
+      if (this.showAllCategories.includes(catId)) {
+        this.showAllCategories = this.showAllCategories.filter(c => c !== catId);
+      } else {
+        this.showAllCategories.push(catId);
+      }
+    },
+
+    scrollToCategory(catId) {
+      this.activeCategory = catId;
+      if (catId === 'all') {
+        window.scrollTo({top: 0, behavior: 'smooth'});
+        return;
+      }
+      const el = document.getElementById('cat-' + catId);
+      if (el) {
+        const offset = 180;
+        const y = el.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({top: y, behavior: 'smooth'});
+      }
+    },
+
+    init() {
+      this.$nextTick(() => {
+        lucide.createIcons();
+
+        // Use MutationObserver to auto-render Lucide icons whenever DOM changes
+        let iconTimer = null;
+        const refreshIcons = () => {
+          clearTimeout(iconTimer);
+          iconTimer = setTimeout(() => lucide.createIcons(), 30);
+        };
+        const iconObserver = new MutationObserver((mutations) => {
+          for (const m of mutations) {
+            if (m.addedNodes.length > 0) { refreshIcons(); break; }
+          }
+        });
+        iconObserver.observe(this.$root, { childList: true, subtree: true });
+      });
+
+      // Intersection observer for active category
+      setTimeout(() => {
+        const observer = new IntersectionObserver((entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              const catId = parseInt(entry.target.id.replace('cat-', ''));
+              this.activeCategory = catId;
+            }
+          }
+        }, {rootMargin: '-200px 0px -60% 0px'});
+
+        this.categories.forEach(cat => {
+          const el = document.getElementById('cat-' + cat.id);
+          if (el) observer.observe(el);
+        });
+      }, 500);
+    }
+  };
+}
+</script>
+</body>
+</html>
