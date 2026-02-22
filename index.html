@@ -3,166 +3,381 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fibo Feature Explorer</title>
+<title>Fibo — Feature Explorer</title>
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <style>
 @theme {
   --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 }
-* { box-sizing: border-box; }
+
+*, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
+
 body {
   font-family: 'Inter', system-ui, sans-serif;
-  background: #06060b;
+  background: #050507;
   color: #e2e8f0;
   margin: 0;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #475569; }
 
+/* === SCROLLBAR === */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+
+/* === NOISE GRAIN OVERLAY === */
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+/* === AURORA BACKGROUND === */
+.aurora-wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+}
+.aurora-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.35;
+  will-change: transform;
+}
+.aurora-1 {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, #3b82f6 0%, transparent 70%);
+  top: -200px; left: 20%;
+  animation: auroraFloat1 20s ease-in-out infinite;
+}
+.aurora-2 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
+  top: -100px; right: 10%;
+  animation: auroraFloat2 25s ease-in-out infinite;
+}
+.aurora-3 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, #ec4899 0%, transparent 70%);
+  top: 50px; left: 50%;
+  animation: auroraFloat3 18s ease-in-out infinite;
+}
+@keyframes auroraFloat1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(80px, 40px) scale(1.1); }
+  66% { transform: translate(-60px, 20px) scale(0.95); }
+}
+@keyframes auroraFloat2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-70px, 50px) scale(0.9); }
+  66% { transform: translate(50px, -30px) scale(1.15); }
+}
+@keyframes auroraFloat3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(60px, -40px) scale(1.05); }
+  66% { transform: translate(-80px, 30px) scale(0.9); }
+}
+
+/* === GRADIENT TEXT === */
 .gradient-text {
-  background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%);
+  background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 40%, #f472b6 80%, #fb923c 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
-.gradient-border {
-  background: linear-gradient(135deg, rgba(96,165,250,0.15), rgba(167,139,250,0.15));
-  border: 1px solid rgba(96,165,250,0.2);
+
+/* === FEATURE CARD === */
+.feature-card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 16px;
+  padding: 20px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.gradient-border-bright {
-  border: 1px solid rgba(96,165,250,0.4);
+.feature-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  padding: 1px;
+  background: linear-gradient(135deg, transparent 40%, rgba(96,165,250,0.3), rgba(167,139,250,0.3), transparent 90%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s ease;
 }
-.card-glow:hover {
-  box-shadow: 0 0 30px rgba(96,165,250,0.08), 0 4px 20px rgba(0,0,0,0.3);
-  border-color: rgba(96,165,250,0.35);
-  transform: translateY(-2px);
+.feature-card:hover::before { opacity: 1; }
+.feature-card:hover {
+  background: rgba(255,255,255,0.04);
+  transform: translateY(-4px);
+  box-shadow:
+    0 0 40px rgba(96,165,250,0.06),
+    0 8px 32px rgba(0,0,0,0.4),
+    0 2px 8px rgba(0,0,0,0.2);
 }
-.hero-glow {
-  background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(96,165,250,0.15), transparent);
+.feature-card:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(96,165,250,0.5);
 }
-.stat-card {
-  background: rgba(15,15,25,0.6);
-  border: 1px solid rgba(255,255,255,0.06);
-  backdrop-filter: blur(10px);
+.feature-card .shine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.03) 45%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.03) 55%, transparent 60%);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+  pointer-events: none;
 }
+.feature-card:hover .shine { transform: translateX(100%); }
+
+/* === STATUS BADGES === */
+.status-implemented { background: rgba(34,197,94,0.1); color: #4ade80; border: 1px solid rgba(34,197,94,0.2); }
+.status-in_progress { background: rgba(59,130,246,0.1); color: #60a5fa; border: 1px solid rgba(59,130,246,0.2); }
+.status-proposed { background: rgba(250,204,21,0.08); color: #fbbf24; border: 1px solid rgba(250,204,21,0.15); }
+.status-planned { background: rgba(168,85,247,0.1); color: #c084fc; border: 1px solid rgba(168,85,247,0.2); }
+.status-discussed { background: rgba(148,163,184,0.08); color: #94a3b8; border: 1px solid rgba(148,163,184,0.15); }
+.status-rejected { background: rgba(239,68,68,0.08); color: #f87171; border: 1px solid rgba(239,68,68,0.15); }
+.status-researched { background: rgba(20,184,166,0.08); color: #2dd4bf; border: 1px solid rgba(20,184,166,0.15); }
+.status-other { background: rgba(148,163,184,0.08); color: #94a3b8; border: 1px solid rgba(148,163,184,0.15); }
+
+/* === PILLS === */
 .pill-active {
   background: linear-gradient(135deg, #3b82f6, #8b5cf6);
   color: white;
   border-color: transparent;
+  box-shadow: 0 0 20px rgba(59,130,246,0.2);
 }
 .pill-inactive {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  color: #94a3b8;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  color: #64748b;
 }
 .pill-inactive:hover {
-  background: rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.06);
   color: #e2e8f0;
-}
-.status-implemented { background: rgba(34,197,94,0.12); color: #4ade80; border: 1px solid rgba(34,197,94,0.25); }
-.status-in_progress { background: rgba(59,130,246,0.12); color: #60a5fa; border: 1px solid rgba(59,130,246,0.25); }
-.status-proposed { background: rgba(250,204,21,0.1); color: #facc15; border: 1px solid rgba(250,204,21,0.2); }
-.status-planned { background: rgba(168,85,247,0.12); color: #c084fc; border: 1px solid rgba(168,85,247,0.25); }
-.status-discussed { background: rgba(148,163,184,0.1); color: #94a3b8; border: 1px solid rgba(148,163,184,0.2); }
-.status-rejected { background: rgba(239,68,68,0.1); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
-.status-researched { background: rgba(20,184,166,0.1); color: #2dd4bf; border: 1px solid rgba(20,184,166,0.2); }
-.status-other { background: rgba(148,163,184,0.1); color: #94a3b8; border: 1px solid rgba(148,163,184,0.2); }
-
-.fade-in { animation: fadeIn 0.4s ease-out; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-
-.search-glow:focus-within {
-  box-shadow: 0 0 0 2px rgba(96,165,250,0.3), 0 0 20px rgba(96,165,250,0.1);
-  border-color: rgba(96,165,250,0.5);
+  border-color: rgba(255,255,255,0.12);
 }
 
+/* === BENTO STAT === */
+.bento-stat {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 20px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+.bento-stat:hover {
+  border-color: rgba(255,255,255,0.1);
+  transform: translateY(-2px);
+}
+.bento-stat .bento-icon {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 16px;
+}
+
+/* === SEARCH BAR === */
+.search-bar {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 14px;
+  transition: all 0.3s ease;
+}
+.search-bar:focus-within {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(96,165,250,0.4);
+  box-shadow: 0 0 0 3px rgba(96,165,250,0.1), 0 0 30px rgba(96,165,250,0.05);
+}
+
+/* === SECTION LINE === */
+.section-line {
+  height: 1px;
+  flex: 1;
+  background: linear-gradient(90deg, rgba(255,255,255,0.06), transparent);
+}
+
+/* === SCROLL REVEAL === */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* === MISC === */
 .category-nav::-webkit-scrollbar { height: 0; }
 .category-nav { -ms-overflow-style: none; scrollbar-width: none; }
+
+.tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.badge-float {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 500;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  animation: badgeFloat 3s ease-in-out infinite;
+}
+@keyframes badgeFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.divider-glow {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(96,165,250,0.15), rgba(167,139,250,0.15), transparent);
+}
+
+.show-more-btn {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 10px 20px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.show-more-btn:hover {
+  background: rgba(255,255,255,0.06);
+  color: #e2e8f0;
+  border-color: rgba(255,255,255,0.12);
+  transform: translateY(-1px);
+}
+
+.count-up { font-variant-numeric: tabular-nums; }
 
 [x-cloak] { display: none !important; }
 </style>
 </head>
 <body>
 
+<!-- Noise grain overlay -->
+<div class="noise-overlay"></div>
+
 <div x-cloak x-data="featureExplorer()" x-init="init()">
 
-  <!-- HERO -->
-  <div class="hero-glow relative overflow-hidden">
-    <div class="max-w-6xl mx-auto px-4 pt-16 pb-10 text-center relative z-10">
-      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium mb-6"
-           style="background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.2);color:#60a5fa">
+  <!-- ============ HERO ============ -->
+  <header class="relative min-h-[520px] flex items-center justify-center overflow-hidden">
+    <div class="aurora-wrap">
+      <div class="aurora-orb aurora-1"></div>
+      <div class="aurora-orb aurora-2"></div>
+      <div class="aurora-orb aurora-3"></div>
+    </div>
+    <div class="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#050507] to-transparent z-[1]"></div>
+
+    <div class="relative z-10 max-w-5xl mx-auto px-6 text-center">
+      <div class="badge-float mx-auto mb-8 w-fit" style="color:#94a3b8">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-        Extracted from 1,828 Telegram messages
+        <span>Extracted from 1,828 Telegram messages</span>
       </div>
-      <h1 class="text-5xl md:text-6xl font-extrabold tracking-tight mb-4">
-        <span class="gradient-text">Fibo</span> Feature Explorer
+
+      <h1 class="text-6xl md:text-8xl font-black tracking-tighter mb-5 leading-[0.9]">
+        <span class="gradient-text">Fibo</span><br>
+        <span class="text-white/90">Feature Explorer</span>
       </h1>
-      <p class="text-lg text-gray-400 max-w-2xl mx-auto mb-10">
-        Every idea, feature, and proposal discussed by the Fibo team from 2024&ndash;2026.
-        Explore the full thinking process behind a health &amp; productivity app for college students.
+      <p class="text-base md:text-lg text-gray-500 max-w-xl mx-auto mb-12 leading-relaxed">
+        Every idea, feature, and proposal discussed by the Fibo team&mdash;curated from two years of building a health &amp; productivity app for college students.
       </p>
-      <div class="flex flex-wrap justify-center gap-4 md:gap-8">
-        <div class="stat-card rounded-xl px-6 py-4 text-center min-w-[120px]">
-          <div class="text-3xl font-bold gradient-text" x-text="totalCount">304</div>
-          <div class="text-xs text-gray-500 mt-1 uppercase tracking-wider">Ideas</div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-2xl mx-auto">
+        <div class="bento-stat text-center">
+          <div class="bento-icon mx-auto" style="background:rgba(96,165,250,0.1)">
+            <i data-lucide="lightbulb" class="w-5 h-5 text-blue-400"></i>
+          </div>
+          <div class="text-3xl font-bold text-white count-up" x-text="features.length">304</div>
+          <div class="tag text-gray-500 mt-1">Ideas</div>
         </div>
-        <div class="stat-card rounded-xl px-6 py-4 text-center min-w-[120px]">
-          <div class="text-3xl font-bold gradient-text">17</div>
-          <div class="text-xs text-gray-500 mt-1 uppercase tracking-wider">Categories</div>
+        <div class="bento-stat text-center">
+          <div class="bento-icon mx-auto" style="background:rgba(167,139,250,0.1)">
+            <i data-lucide="layers" class="w-5 h-5 text-violet-400"></i>
+          </div>
+          <div class="text-3xl font-bold text-white count-up">17</div>
+          <div class="tag text-gray-500 mt-1">Categories</div>
         </div>
-        <div class="stat-card rounded-xl px-6 py-4 text-center min-w-[120px]">
-          <div class="text-3xl font-bold gradient-text">11</div>
-          <div class="text-xs text-gray-500 mt-1 uppercase tracking-wider">Contributors</div>
+        <div class="bento-stat text-center">
+          <div class="bento-icon mx-auto" style="background:rgba(244,114,182,0.1)">
+            <i data-lucide="users" class="w-5 h-5 text-pink-400"></i>
+          </div>
+          <div class="text-3xl font-bold text-white count-up">11</div>
+          <div class="tag text-gray-500 mt-1">Contributors</div>
         </div>
-        <div class="stat-card rounded-xl px-6 py-4 text-center min-w-[120px]">
-          <div class="text-3xl font-bold gradient-text" x-text="implementedCount">108</div>
-          <div class="text-xs text-gray-500 mt-1 uppercase tracking-wider">Built</div>
+        <div class="bento-stat text-center">
+          <div class="bento-icon mx-auto" style="background:rgba(34,197,94,0.1)">
+            <i data-lucide="check-circle" class="w-5 h-5 text-green-400"></i>
+          </div>
+          <div class="text-3xl font-bold text-white count-up" x-text="features.filter(f => f.statusGroup==='implemented').length">108</div>
+          <div class="tag text-gray-500 mt-1">Shipped</div>
         </div>
       </div>
     </div>
-  </div>
+  </header>
 
-  <!-- STICKY SEARCH + FILTER BAR -->
-  <div class="sticky top-0 z-50 border-b border-white/5" style="background:rgba(6,6,11,0.85);backdrop-filter:blur(16px);">
+  <!-- ============ STICKY TOOLBAR ============ -->
+  <div class="sticky top-0 z-50" style="background:rgba(5,5,7,0.8);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);">
+    <div class="divider-glow"></div>
     <div class="max-w-6xl mx-auto px-4 py-3">
-      <!-- Search -->
-      <div class="search-glow flex items-center gap-3 rounded-xl px-4 py-2.5 mb-3 transition-all"
-           style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
-        <i data-lucide="search" class="w-4 h-4 text-gray-500 shrink-0"></i>
-        <input type="text" x-model="search" :placeholder="'Search ' + features.length + ' features...'"
-               class="bg-transparent border-0 outline-none w-full text-sm text-gray-200 placeholder-gray-500">
+      <div class="search-bar flex items-center gap-3 px-4 py-2.5 mb-3">
+        <i data-lucide="search" class="w-4 h-4 text-gray-600 shrink-0"></i>
+        <input type="text" x-model="search"
+               :placeholder="'Search ' + features.length + ' features...'"
+               class="bg-transparent border-0 outline-none w-full text-sm text-gray-200 placeholder-gray-600">
         <template x-if="search">
-          <button @click="search = ''" class="text-gray-500 hover:text-gray-300 transition-colors">
+          <button @click="search = ''" class="text-gray-600 hover:text-gray-300 transition-colors cursor-pointer">
             <i data-lucide="x" class="w-4 h-4"></i>
           </button>
         </template>
       </div>
-
-      <!-- Status filter chips -->
       <div class="flex flex-wrap gap-2 mb-3">
         <template x-for="s in statusOptions" :key="s.key">
           <button @click="toggleStatus(s.key)"
                   :class="activeStatuses.includes(s.key) ? 'pill-active' : 'pill-inactive'"
-                  class="px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5">
+                  class="px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5">
             <span x-text="s.label"></span>
-            <span class="opacity-60" x-text="'(' + statusCounts[s.key] + ')'"></span>
+            <span class="opacity-50 tag" x-text="statusCounts[s.key]"></span>
           </button>
         </template>
         <button x-show="activeStatuses.length > 0" @click="activeStatuses = []"
-                class="px-3 py-1 rounded-full text-xs font-medium text-gray-500 hover:text-gray-300 transition-colors cursor-pointer">
-          Clear filters
+                class="px-3 py-1.5 rounded-full text-xs font-medium text-gray-600 hover:text-gray-300 transition-colors cursor-pointer">
+          Clear
         </button>
       </div>
-
-      <!-- Category pills -->
       <div class="category-nav flex gap-2 overflow-x-auto pb-1">
         <button @click="scrollToCategory('all')"
                 :class="activeCategory === 'all' ? 'pill-active' : 'pill-inactive'"
@@ -175,124 +390,125 @@ body {
                   class="px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-1.5">
             <i :data-lucide="cat.icon" class="w-3 h-3"></i>
             <span x-text="cat.name"></span>
-            <span class="opacity-50" x-text="'(' + getCategoryCount(cat.id) + ')'"></span>
+            <span class="opacity-40 tag" x-text="getCategoryCount(cat.id)"></span>
           </button>
         </template>
       </div>
     </div>
-
-    <!-- Results count bar -->
     <div x-show="search || activeStatuses.length > 0" class="max-w-6xl mx-auto px-4 pb-2">
-      <div class="text-xs text-gray-500">
-        Showing <span class="text-gray-300 font-medium" x-text="filteredFeatures.length"></span> of <span x-text="features.length"></span> features
+      <div class="text-xs text-gray-600">
+        Showing <span class="text-gray-400 font-medium" x-text="filteredFeatures.length"></span>
+        of <span x-text="features.length"></span> features
       </div>
     </div>
+    <div class="divider-glow"></div>
   </div>
 
-  <!-- MAIN CONTENT -->
-  <div class="max-w-6xl mx-auto px-4 py-8">
+  <!-- ============ MAIN CONTENT ============ -->
+  <main class="max-w-6xl mx-auto px-4 pt-10 pb-16">
     <template x-for="cat in categories" :key="cat.id">
-      <div x-show="getCategoryFeatures(cat.id).length > 0"
-           :id="'cat-' + cat.id"
-           class="mb-12 fade-in">
-        <!-- Category header -->
-        <div class="flex items-center gap-3 mb-5">
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-               style="background:linear-gradient(135deg,rgba(96,165,250,0.15),rgba(167,139,250,0.15));border:1px solid rgba(96,165,250,0.2)">
+      <section x-show="getCategoryFeatures(cat.id).length > 0"
+               :id="'cat-' + cat.id"
+               class="mb-16 reveal"
+               :class="{'visible': true}">
+        <div class="flex items-center gap-4 mb-6">
+          <div class="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
+               style="background:linear-gradient(135deg,rgba(96,165,250,0.12),rgba(167,139,250,0.12));border:1px solid rgba(96,165,250,0.15)">
             <i :data-lucide="cat.icon" class="w-5 h-5 text-blue-400"></i>
           </div>
-          <div>
-            <h2 class="text-xl font-bold text-white" x-text="cat.name"></h2>
-            <p class="text-xs text-gray-500" x-text="getCategoryCount(cat.id) + ' features'"></p>
+          <div class="flex-1 min-w-0">
+            <h2 class="text-lg font-bold text-white leading-tight" x-text="cat.name"></h2>
+            <p class="text-xs text-gray-600 mt-0.5">
+              <span x-text="getCategoryCount(cat.id)"></span> features
+            </p>
           </div>
+          <div class="section-line hidden md:block"></div>
         </div>
-
-        <!-- Cards grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           <template x-for="(feature, idx) in getVisibleFeatures(cat.id)" :key="feature.id">
             <div @click="(feature.description || feature.sourceUrl) && toggleExpand(feature.id)"
                  @keydown.enter="(feature.description || feature.sourceUrl) && toggleExpand(feature.id)"
                  @keydown.space.prevent="(feature.description || feature.sourceUrl) && toggleExpand(feature.id)"
-                 role="button"
-                 tabindex="0"
-                 class="rounded-xl p-4 cursor-pointer transition-all duration-200 card-glow focus:outline-none focus:ring-2 focus:ring-blue-500/30"
-                 style="background:rgba(15,15,25,0.5);border:1px solid rgba(255,255,255,0.06);">
-              <!-- Card header -->
-              <div class="flex items-start justify-between gap-2 mb-2">
-                <h3 class="text-sm font-semibold text-gray-100 leading-snug" x-text="feature.title"></h3>
+                 role="button" tabindex="0"
+                 class="feature-card">
+              <div class="shine"></div>
+              <div class="flex items-start justify-between gap-3 mb-2 relative z-10">
+                <h3 class="text-[13px] font-semibold text-gray-100 leading-snug" x-text="feature.title"></h3>
                 <span :class="'status-' + feature.statusGroup"
                       class="text-[10px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap shrink-0"
                       x-text="feature.statusGroup.replace('_',' ').replace(/\b\w/g, c => c.toUpperCase())"></span>
               </div>
-
-              <!-- Sender -->
-              <div x-show="feature.sender" class="flex items-center gap-1.5 mb-2">
-                <i data-lucide="user" class="w-3 h-3 text-gray-600"></i>
-                <span class="text-xs text-gray-500" x-text="feature.sender"></span>
-              </div>
-
-              <!-- Expanded content -->
-              <div x-show="expandedIds.includes(feature.id)" x-collapse class="mt-3 pt-3 border-t border-white/5">
-                <p x-show="feature.description" class="text-xs text-gray-400 leading-relaxed mb-2" x-text="feature.description"></p>
-                <div x-show="feature.status && feature.status !== feature.statusGroup" class="text-[10px] text-gray-600 mb-1">
-                  Status detail: <span class="text-gray-500" x-text="feature.status"></span>
+              <div x-show="feature.sender" class="flex items-center gap-1.5 mb-2 relative z-10">
+                <div class="w-4 h-4 rounded-full flex items-center justify-center" style="background:rgba(255,255,255,0.05)">
+                  <i data-lucide="user" class="w-2.5 h-2.5 text-gray-600"></i>
                 </div>
-                <a x-show="feature.sourceUrl" :href="feature.sourceUrl" target="_blank" @click.stop
-                   class="inline-flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 transition-colors mt-1">
-                  <i data-lucide="external-link" class="w-3 h-3"></i>
-                  <span x-text="feature.source || 'View source'"></span>
-                </a>
+                <span class="text-[11px] text-gray-600" x-text="feature.sender"></span>
               </div>
-
-              <!-- Expand hint -->
-              <div x-show="!expandedIds.includes(feature.id) && feature.description" class="mt-2">
-                <span class="text-[10px] text-gray-600 flex items-center gap-1">
-                  <i data-lucide="chevron-down" class="w-3 h-3"></i> Click to expand
+              <div x-show="expandedIds.includes(feature.id)" x-collapse class="relative z-10">
+                <div class="mt-3 pt-3 border-t border-white/5">
+                  <p x-show="feature.description" class="text-xs text-gray-400 leading-relaxed mb-3" x-text="feature.description"></p>
+                  <div x-show="feature.status && feature.status !== feature.statusGroup" class="text-[10px] text-gray-600 mb-1.5" style="font-family:'JetBrains Mono',monospace">
+                    status: <span class="text-gray-500" x-text="feature.status"></span>
+                  </div>
+                  <a x-show="feature.sourceUrl" :href="feature.sourceUrl" target="_blank" @click.stop
+                     class="inline-flex items-center gap-1.5 text-xs text-blue-400/80 hover:text-blue-300 transition-colors mt-1 group">
+                    <i data-lucide="external-link" class="w-3 h-3 group-hover:translate-x-0.5 transition-transform"></i>
+                    <span x-text="feature.source || 'View source'"></span>
+                  </a>
+                </div>
+              </div>
+              <div x-show="!expandedIds.includes(feature.id) && (feature.description || feature.sourceUrl)" class="mt-2 relative z-10">
+                <span class="text-[10px] text-gray-700 flex items-center gap-1">
+                  <i data-lucide="chevron-down" class="w-3 h-3"></i> Expand
                 </span>
               </div>
             </div>
           </template>
         </div>
-
-        <!-- Show more button -->
-        <div x-show="getCategoryFeatures(cat.id).length > defaultShowCount" class="mt-4 text-center">
-          <button @click="toggleShowAll(cat.id)"
-                  class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors"
-                  style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
+        <div x-show="getCategoryFeatures(cat.id).length > defaultShowCount" class="mt-5 text-center">
+          <button @click="toggleShowAll(cat.id)" class="show-more-btn inline-flex items-center gap-2">
             <template x-if="!showAllCategories.includes(cat.id)">
               <span class="flex items-center gap-2">
                 Show all <span x-text="getCategoryFeatures(cat.id).length"></span>
-                <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
               </span>
             </template>
             <template x-if="showAllCategories.includes(cat.id)">
               <span class="flex items-center gap-2">
                 Show less
-                <i data-lucide="chevron-up" class="w-4 h-4"></i>
+                <i data-lucide="chevron-up" class="w-3.5 h-3.5"></i>
               </span>
             </template>
           </button>
         </div>
-      </div>
+      </section>
     </template>
-
-    <!-- Empty state -->
-    <div x-show="filteredFeatures.length === 0" class="text-center py-20">
-      <i data-lucide="search-x" class="w-12 h-12 text-gray-700 mx-auto mb-4"></i>
-      <p class="text-gray-500 text-lg">No features match your search</p>
+    <div x-show="filteredFeatures.length === 0" class="text-center py-24">
+      <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06)">
+        <i data-lucide="search-x" class="w-7 h-7 text-gray-700"></i>
+      </div>
+      <p class="text-gray-500 text-lg font-medium">No features found</p>
+      <p class="text-gray-700 text-sm mt-1">Try a different search or filter</p>
       <button @click="search = ''; activeStatuses = []"
-              class="mt-4 px-4 py-2 rounded-lg text-sm text-blue-400 hover:text-blue-300 cursor-pointer"
-              style="background:rgba(59,130,246,0.1);">
-        Clear all filters
+              class="mt-6 show-more-btn inline-flex items-center gap-2 cursor-pointer">
+        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+        Reset filters
       </button>
     </div>
-  </div>
+  </main>
 
-  <!-- FOOTER -->
-  <footer class="border-t border-white/5 py-8 mt-8">
-    <div class="max-w-6xl mx-auto px-4 text-center text-xs text-gray-600">
-      <p>Fibo Feature Explorer &mdash; Extracted from Telegram group chat (2024&ndash;2026)</p>
-      <p class="mt-1">Fibonacci Labs, LLC &middot; <span x-text="features.length"></span> features across 17 categories &middot; 1,828 messages analyzed</p>
+  <!-- ============ FOOTER ============ -->
+  <footer class="relative">
+    <div class="divider-glow"></div>
+    <div class="max-w-6xl mx-auto px-4 py-10 text-center">
+      <div class="inline-flex items-center gap-2 mb-3">
+        <span class="gradient-text font-bold text-sm">Fibo</span>
+        <span class="text-gray-700 text-xs">by Fibonacci Labs</span>
+      </div>
+      <p class="text-[11px] text-gray-700">
+        <span x-text="features.length"></span> features &middot; 17 categories &middot; 11 contributors &middot; 1,828 messages analyzed
+      </p>
+      <p class="text-[10px] text-gray-800 mt-2">2024 &ndash; 2026</p>
     </div>
   </footer>
 </div>
@@ -4253,7 +4469,7 @@ const FEATURES_DATA = [
 "source": null,
 "sourceUrl": null
 }
-];
+]
 
 function featureExplorer() {
   return {
@@ -4326,19 +4542,14 @@ function featureExplorer() {
     getCategoryFeatures(catId) {
       return this.filteredFeatures.filter(f => f.categoryId === catId);
     },
-
     getCategoryCount(catId) {
       return this.getCategoryFeatures(catId).length;
     },
-
     getShowLimit(catId) {
       return this.showAllCategories.includes(catId) ? 999 : this.defaultShowCount;
     },
-
     getVisibleFeatures(catId) {
-      const feats = this.getCategoryFeatures(catId);
-      const limit = this.getShowLimit(catId);
-      return feats.slice(0, limit);
+      return this.getCategoryFeatures(catId).slice(0, this.getShowLimit(catId));
     },
 
     toggleStatus(key) {
@@ -4348,7 +4559,6 @@ function featureExplorer() {
         this.activeStatuses.push(key);
       }
     },
-
     toggleExpand(id) {
       if (this.expandedIds.includes(id)) {
         this.expandedIds = this.expandedIds.filter(i => i !== id);
@@ -4356,7 +4566,6 @@ function featureExplorer() {
         this.expandedIds.push(id);
       }
     },
-
     toggleShowAll(catId) {
       if (this.showAllCategories.includes(catId)) {
         this.showAllCategories = this.showAllCategories.filter(c => c !== catId);
@@ -4364,17 +4573,12 @@ function featureExplorer() {
         this.showAllCategories.push(catId);
       }
     },
-
     scrollToCategory(catId) {
       this.activeCategory = catId;
-      if (catId === 'all') {
-        window.scrollTo({top: 0, behavior: 'smooth'});
-        return;
-      }
+      if (catId === 'all') { window.scrollTo({top: 0, behavior: 'smooth'}); return; }
       const el = document.getElementById('cat-' + catId);
       if (el) {
-        const offset = 180;
-        const y = el.getBoundingClientRect().top + window.scrollY - offset;
+        const y = el.getBoundingClientRect().top + window.scrollY - 200;
         window.scrollTo({top: y, behavior: 'smooth'});
       }
     },
@@ -4382,8 +4586,6 @@ function featureExplorer() {
     init() {
       this.$nextTick(() => {
         lucide.createIcons();
-
-        // Use MutationObserver to auto-render Lucide icons whenever DOM changes
         let iconTimer = null;
         const refreshIcons = () => {
           clearTimeout(iconTimer);
@@ -4397,22 +4599,32 @@ function featureExplorer() {
         iconObserver.observe(this.$root, { childList: true, subtree: true });
       });
 
-      // Intersection observer for active category
       setTimeout(() => {
-        const observer = new IntersectionObserver((entries) => {
+        // Scroll reveal
+        const revealObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry, i) => {
+            if (entry.isIntersecting) {
+              setTimeout(() => entry.target.classList.add('visible'), i * 80);
+              revealObserver.unobserve(entry.target);
+            }
+          });
+        }, { rootMargin: '0px 0px -60px 0px' });
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+        // Active category tracking
+        const catObserver = new IntersectionObserver((entries) => {
           for (const entry of entries) {
             if (entry.isIntersecting) {
               const catId = parseInt(entry.target.id.replace('cat-', ''));
-              this.activeCategory = catId;
+              if (!isNaN(catId)) this.activeCategory = catId;
             }
           }
-        }, {rootMargin: '-200px 0px -60% 0px'});
-
+        }, { rootMargin: '-200px 0px -60% 0px' });
         this.categories.forEach(cat => {
           const el = document.getElementById('cat-' + cat.id);
-          if (el) observer.observe(el);
+          if (el) catObserver.observe(el);
         });
-      }, 500);
+      }, 300);
     }
   };
 }
